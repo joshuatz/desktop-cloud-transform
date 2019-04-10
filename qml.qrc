@@ -4,5 +4,7 @@
         <file>qml/components/TopBar.qml</file>
         <file>qml/components/TransformationList.qml</file>
         <file>qml/components/BottomBar.qml</file>
+        <file>qml/components/FileDropArea.qml</file>
+        <file>qml/components/DashedRectangle.qml</file>
     </qresource>
 </RCC>

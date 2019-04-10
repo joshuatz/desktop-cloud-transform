@@ -22,5 +22,8 @@ ApplicationWindow {
     TransformationList {}
 
     // Bottom Bar - area to drop file to upload
-    BottomBar {}
+    BottomBar {
+        width: parent.width
+        anchors.bottom: parent.bottom
+    }
 }
