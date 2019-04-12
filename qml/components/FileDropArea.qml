@@ -30,6 +30,7 @@ Item {
                     // not much info gets passed in about the file itself in the dragevent. Pass to another function to test for valid image and process
                     if (Helpers.checkValidImageFilePath(filepath)){
                         console.log("Valid image dropped! :)");
+                        Uploader.uploadImageFromLocalPath(filepath);
                     }
                     else {
                         // @TODO popup message

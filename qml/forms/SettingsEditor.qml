@@ -34,7 +34,7 @@ Item {
                     id: cloudinaryCloudNameInput
                     width: parent.width * 0.6
                     placeholderText: "pw3abc8ac"
-                    text: GlobalSettings.cloudinaryCloudName
+                    text: GlobalSettings.getCloudinaryCloudName();
                 }
             }
             Row {
@@ -53,6 +53,7 @@ Item {
                     id: cloudinaryApiKeyInput
                     width: parent.width * 0.6
                     placeholderText: "123456789012123"
+                    text: GlobalSettings.getCloudinaryApiKey();
                 }
             }
             Row {
@@ -71,6 +72,7 @@ Item {
                     id: cloudinaryApiSecretInput
                     width: parent.width * 0.6
                     placeholderText: "KNI5QG3uL2v8v846mqVycfD1LYg"
+                    text: GlobalSettings.getCloudinaryApiSecret();
                 }
             }
         }

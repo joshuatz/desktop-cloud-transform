@@ -4,7 +4,10 @@
 #include <QDebug>
 #include <QCryptographicHash>
 #include <QtNetwork>
+#include <QFile>
+#include <QfileInfo>
 #include "helpers.h"
+#include "models/uploader.h"
 
 Cloudinary::Cloudinary()
 {
@@ -12,7 +15,7 @@ Cloudinary::Cloudinary()
 }
 
 QString Cloudinary::generateSignature(QMap<QString,QVariant> paramsToSign, QString apiSecret){
-    QList<QString> excludedParams = {"file","resource_type","api_key"};
+    QList<QString> excludedParams = {"file","filepath","resource_type","api_key"};
     QString unhashedSignature = "";
     // Check for timestamp in params
     if (paramsToSign.contains("timestamp")==false){
@@ -22,11 +25,14 @@ QString Cloudinary::generateSignature(QMap<QString,QVariant> paramsToSign, QStri
     QMap<QString,QVariant>::iterator i;
     int index = 0;
     for (i = paramsToSign.begin(); i != paramsToSign.end(); ++i){
-        unhashedSignature += ((index > 0) ? "&" : "") + i.key() + "=" + i.value().toString();
-        index++;
+        if (excludedParams.contains(i.key())==false){
+            unhashedSignature += ((index > 0) ? "&" : "") + i.key() + "=" + i.value().toString();
+            index++;
+        }
     }
     // Now append the api key directly (no & to join)
     unhashedSignature += apiSecret;
+    qDebug() << unhashedSignature;
     // return sha-1'ed output of signature (digest)
     return QCryptographicHash::hash(unhashedSignature.toUtf8(),QCryptographicHash::Sha1).toHex();
 }
@@ -39,6 +45,106 @@ QString Cloudinary::generateSignature(QMap<QString,QVariant> paramsToSign, QStri
  *      - https://github.com/cloudinary/cloudinary_java/blob/e1b363218f89df9ebe92a86ed64ce7ffd2c25a09/cloudinary-core/src/main/java/com/cloudinary/Cloudinary.java#L129
  *
  */
+
+void Cloudinary::uploadLocalFileByPath(QString localImagePath){
+    QMap<QString,QVariant> params;
+    params.insert("filepath",localImagePath);
+    uploadFileByParams(params);
+}
+
+void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
+    QMimeDatabase mimeDb;
+    bool mock = false;
+
+    // check for timestamp
+    if (params.contains("timestamp")==false){
+        long long timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        params.insert("timestamp",timestamp);
+    }
+    // Check for auth
+    if (params.contains("signature")==false){
+        params.insert("signature",generateSignature(params,GlobalSettings::getInstance()->getCloudinaryApiSecret()));
+    }
+    if (params.contains("api_key")==false){
+        params.insert("api_key",GlobalSettings::getInstance()->getCloudinaryApiKey());
+    }
+
+    if (mock){
+        params.insert("api_key","foobar");
+    }
+    // Construct a multi-part form request, starting with the actual form-data
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    QMap<QString,QVariant>::iterator i;
+    for (i = params.begin(); i != params.end(); ++i){
+        bool keyValIsString = i.value().type()==QVariant::String || i.value().type() == QMetaType::QString;
+        if ((i.key()=="filepath" && params.contains("file")==false) || (i.key()=="file" && i.value().type() == QVariant::String && Helpers::checkValidImageFilePath(i.value().toString()))){
+            // Let other funcs pass file as a filepath string instead of raw file
+            QString filePath = i.value().toString();
+            QHttpPart imagePart;
+            QFile *file = new QFile(filePath);
+            QString filename = QFileInfo(filePath).fileName();
+            // Note - image form part needs "filename" attribute on content-disposition, and then the image mime type on Content-Type header
+            imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"" + filename + "\""));
+            imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(mimeDb.mimeTypeForFile(filePath).name()));
+            file->open(QIODevice::ReadOnly);
+            imagePart.setBodyDevice(file);
+            file->setParent(multiPart);
+            multiPart->append(imagePart);
+        }
+        else if (i.key()=="file" && (i.value().type() == QVariant::ByteArray || i.value().type() == QMetaType::QByteArray)){
+            QHttpPart imagePart;
+            imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\""));
+            imagePart.setBody(i.value().toByteArray());
+            multiPart->append(imagePart);
+        }
+        else if (i.value().canConvert(QMetaType::QString) || i.value().canConvert(QMetaType::Int)) {
+            // Normal form section
+            QHttpPart textPart;
+            textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"" + i.key() + "\""));
+            const QString textVal = i.value().toString();
+            textPart.setBody(i.value().toByteArray());
+            multiPart->append(textPart);
+        }
+    }
+    qDebug() << "About to make POST to Cloudinary with form-data";
+    QNetworkAccessManager *netManager = new QNetworkAccessManager();
+    QNetworkRequest request;
+    if (mock){
+        request = QNetworkRequest(QString("http://requestbin.fullcontact.com/15cpiif1"));
+    }
+    else {
+        request = QNetworkRequest(Cloudinary::getUploadEndpoint("image"));
+    }
+    QNetworkReply *reply = netManager->post(request, multiPart);
+    // Set up connect to listen for result
+    // Use lambda as receiver with connect to get result of network finished event
+    QObject::connect(netManager,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
+        if (finishedReply->error()){
+            qDebug() << "FAIL!";
+            qDebug() << (QString) request.url().toString();
+            qDebug() << (QString) finishedReply->readAll();
+        }
+        else {
+            qDebug() << "image uploaded";
+        }
+    });
+//    QObject::connect(reply,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
+//        if (finishedReply->error()){
+//            qDebug() << "FAIL!";
+//        }
+//        else {
+//            qDebug() << "image uploaded";
+//        }
+//    });
+
+    Uploader uploader;
+//    QObject::connect(&netManager,SIGNAL(finished()),&uploader,SLOT(uploader.receiveNetworkReply()));
+    QObject::connect(reply,SIGNAL(finished()),&uploader,SLOT(Uploader::receiveNetworkReply()));
+    // Actually make the request
+    //QNetworkReply *reply = netManager.post(request, multiPart);
+    qDebug() << reply;
+    //multiPart->setParent(reply); // delete the multiPart with the reply
+}
 
 void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
     QNetworkAccessManager *netManager = new QNetworkAccessManager();
@@ -53,11 +159,12 @@ void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
     params.insert("signature",signature);
     // Construct POST
     QUrlQuery postData = Helpers::generateUrlQueryFromVarMap(params);
-    QNetworkRequest request(Cloudinary::getUploadEndpoint());
+    QNetworkRequest request(Cloudinary::getUploadEndpoint("image"));
     request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
     netManager->post(request,postData.toString(QUrl::FullyEncoded).toUtf8());
+
 }
 
-QString Cloudinary::getUploadEndpoint(){
-    return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName()  + "/auto/upload";
+QString Cloudinary::getUploadEndpoint(QString resourceType){
+    return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName()  + "/" + resourceType + "/upload";
 }
