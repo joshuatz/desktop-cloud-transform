@@ -26,8 +26,12 @@ int main(int argc, char *argv[])
 //    paramMap.insert("TestKeyProp",QVariant("Test key val"));
 //    qDebug() << Cloudinary::generateSignature(paramMap,"fakeapikey");
 
+    // Create class instances
+    Helpers myHelpers;
+
     // Register contexts
     engine.rootContext()->setContextProperty("GlobalSettings",GlobalSettings::getInstance());
+    engine.rootContext()->setContextProperty("Helpers",&myHelpers);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())

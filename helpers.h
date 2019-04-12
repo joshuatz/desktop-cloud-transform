@@ -2,13 +2,17 @@
 #define HELPERS_H
 
 #include <QObject>
-#include <QtNetwork>
 
-class Helpers
+class Helpers : public QObject
 {
+    Q_OBJECT
 public:
-    Helpers();
+    explicit Helpers(QObject *parent = nullptr);
     static void checkInternetConnection(bool *res);
+signals:
+public slots:
+    static bool checkValidImageFilePath(QString imagePath);
+private:
 };
 
 #endif // HELPERS_H

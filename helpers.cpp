@@ -1,8 +1,10 @@
 #include "helpers.h"
 #include <QObject>
 #include <QDebug>
+#include <QImageReader>
+#include <QtNetwork>
 
-Helpers::Helpers()
+Helpers::Helpers(QObject *parent) : QObject(parent)
 {
 
 }
@@ -24,4 +26,12 @@ void Helpers::checkInternetConnection(bool *res){
 
     // Start the network request
     QNetworkReply *netReply = netManager->get(QNetworkRequest(QString("https://www.google.com/")));
+}
+
+bool Helpers::checkValidImageFilePath(QString imagePath){
+    QImageReader reader(imagePath);
+    if (reader.canRead()){
+        return true;
+    }
+    return false;
 }
