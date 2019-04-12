@@ -1,22 +1,33 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
+import "../"
 
 Item {
     id: root
     width: parent.width
     height: 50
+    property alias background : container.color
     Rectangle {
+        id: container
         anchors.fill: parent
-        color: Material.color(Material.primary)
+        color: Material.primary
         Button {
+            anchors.left: parent.left
+            anchors.leftMargin: parent.width * 0.1
+            width: 60
             id: uploadFileSelectButton
             text: qsTr("Upload")
+            Material.background: ThemeColors.darkAccent
         }
         FileDropArea {
             anchors.left: uploadFileSelectButton.right
-            width: 200
-            height: 40
+            anchors.leftMargin: parent.width * 0.1
+            width: parent.width - uploadFileSelectButton.width - (parent.width * 0.3)
+            height: parent.height * 0.8
+            anchors.top: parent.top
+            anchors.topMargin: parent.height * 0.1
+            background: ThemeColors.darkAccentLight
         }
 
     }

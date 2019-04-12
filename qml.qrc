@@ -1,11 +1,14 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
         <file>qml/components/TopBar.qml</file>
         <file>qml/components/TransformationList.qml</file>
         <file>qml/components/BottomBar.qml</file>
         <file>qml/components/FileDropArea.qml</file>
         <file>qml/components/DashedRectangle.qml</file>
         <file>qml/forms/SettingsEditor.qml</file>
+        <file>qml/ThemeColors.qml</file>
+        <file>qml/qmldir</file>
     </qresource>
 </RCC>

@@ -1,15 +1,17 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
+import "../"
 
 Item {
     id: root
     width: parent.width
     height: 80
     property var settingsPopup
+    property alias background : container.color
     Rectangle {
         id: container
-        color: Material.color(Material.primary)
+        color: Material.primary
         anchors.fill: parent
         property int numButtons: 2
         property int spacing: Math.round((root.width - addNewTrButton.width - settingsButton.width) / (numButtons + 1))
@@ -21,7 +23,7 @@ Item {
             anchors.leftMargin: container.spacing
             anchors.top: parent.top
             anchors.topMargin: (parent.height - height) / 2
-            Material.background: Material.accent
+            Material.background: ThemeColors.darkAccent
         }
         Button {
             id: settingsButton
@@ -30,7 +32,7 @@ Item {
             anchors.leftMargin: container.spacing
             anchors.top: parent.top
             anchors.topMargin: (parent.height - height) / 2
-            Material.background: Material.accent
+            Material.background: ThemeColors.darkAccent
             onClicked: {
                 settingsPopup.open();
             }
@@ -42,7 +44,7 @@ Item {
             anchors.rightMargin: 10
             anchors.top: parent.top
             anchors.topMargin: (parent.height - height) / 2
-            Material.background: Material.accent
+            Material.background: ThemeColors.darkAccent
         }
     }
 }

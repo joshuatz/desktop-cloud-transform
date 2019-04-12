@@ -3,6 +3,7 @@ import QtQuick.Shapes 1.12
 
 Item {
     property alias customInset: shapeRoot.customInset
+    property alias background: rect.color
     width: 400
     height: 400
     Rectangle {
