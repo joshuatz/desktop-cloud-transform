@@ -20,16 +20,9 @@ public:
     explicit GlobalSettings(QObject *parent = nullptr);
     static GlobalSettings *getInstance();
     static QString TABLE_NAME;
-//    struct settingDbResult {
-//        bool found;
-//        QString value;
-//        settingDbResult(bool found,QString value) :
-//            found(found),
-//            value(value)
-//        {}
-//    };
 signals:
     void settingsChanged();
+    void internetConnectionChanged();
 public slots:
     bool updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret);
     void loadFromStorage();
@@ -39,6 +32,7 @@ private:
     QString m_cloudinaryCloudName;
     QString m_cloudinaryApiKey;
     QString m_cloudinaryApiSecret;
+    bool m_hasInternet = false;
     settingDbResult getSettingStringFromDb(QString settingKey);
     bool saveSettingStringToDb(QString settingKey, QString settingVal);
 };

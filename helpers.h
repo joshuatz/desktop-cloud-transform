@@ -2,12 +2,13 @@
 #define HELPERS_H
 
 #include <QObject>
+#include <QtNetwork>
 
 class Helpers
 {
 public:
     Helpers();
-    bool checkInternetConnection();
+    static void checkInternetConnection(bool *res);
 };
 
 #endif // HELPERS_H

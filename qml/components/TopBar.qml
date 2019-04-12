@@ -6,6 +6,7 @@ Item {
     id: root
     width: parent.width
     height: 80
+    property var settingsPopup
     Rectangle {
         id: container
         color: Material.color(Material.primary)
@@ -30,6 +31,9 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: (parent.height - height) / 2
             Material.background: Material.accent
+            onClicked: {
+                settingsPopup.open();
+            }
         }
         RoundButton {
             id: helpButton

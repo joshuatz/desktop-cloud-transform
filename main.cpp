@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include "helpers.h"
 #include "database.h"
 #include "globalsettings.h"
 
@@ -11,6 +12,8 @@ int main(int argc, char *argv[])
 
     // Load global settings into memory
     GlobalSettings::getInstance()->loadFromStorage();
+
+
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 

@@ -6,5 +6,6 @@
         <file>qml/components/BottomBar.qml</file>
         <file>qml/components/FileDropArea.qml</file>
         <file>qml/components/DashedRectangle.qml</file>
+        <file>qml/forms/SettingsEditor.qml</file>
     </qresource>
 </RCC>
