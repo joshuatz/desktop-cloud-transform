@@ -2,6 +2,7 @@
 #define HELPERS_H
 
 #include <QObject>
+#include <QtNetwork>
 
 class Helpers : public QObject
 {
@@ -9,6 +10,7 @@ class Helpers : public QObject
 public:
     explicit Helpers(QObject *parent = nullptr);
     static void checkInternetConnection(bool *res);
+    static QUrlQuery generateUrlQueryFromVarMap(QMap<QString,QVariant> params);
 signals:
 public slots:
     static bool checkValidImageFilePath(QString imagePath);

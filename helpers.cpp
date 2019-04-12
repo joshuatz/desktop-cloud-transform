@@ -35,3 +35,12 @@ bool Helpers::checkValidImageFilePath(QString imagePath){
     }
     return false;
 }
+
+QUrlQuery Helpers::generateUrlQueryFromVarMap(QMap<QString, QVariant> params){
+    QUrlQuery query;
+    QMap<QString,QVariant>::iterator i;
+    for (i = params.begin(); i != params.end(); ++i){
+        query.addQueryItem(i.key(),i.value().toString());
+    }
+    return query;
+}

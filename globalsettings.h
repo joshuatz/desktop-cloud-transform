@@ -12,7 +12,6 @@ struct settingDbResult {
     {}
 };
 
-
 class GlobalSettings : public QObject
 {
     Q_OBJECT
@@ -28,6 +27,15 @@ public slots:
     bool updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret);
     void loadFromStorage();
     void saveToStorage();
+    QString getCloudinaryCloudName(){
+        return m_cloudinaryCloudName;
+    }
+    QString getCloudinaryApiKey(){
+        return m_cloudinaryApiKey;
+    }
+    QString getCloudinaryApiSecret(){
+        return m_cloudinaryApiSecret;
+    }
 private:
     static GlobalSettings *m_instance;
     QString m_cloudinaryCloudName;

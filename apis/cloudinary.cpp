@@ -1,7 +1,10 @@
 #include "cloudinary.h"
+#include "globalsettings.h"
 #include <QDateTime>
 #include <QDebug>
 #include <QCryptographicHash>
+#include <QtNetwork>
+#include "helpers.h"
 
 Cloudinary::Cloudinary()
 {
@@ -36,3 +39,25 @@ QString Cloudinary::generateSignature(QMap<QString,QVariant> paramsToSign, QStri
  *      - https://github.com/cloudinary/cloudinary_java/blob/e1b363218f89df9ebe92a86ed64ce7ffd2c25a09/cloudinary-core/src/main/java/com/cloudinary/Cloudinary.java#L129
  *
  */
+
+void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
+    QNetworkAccessManager *netManager = new QNetworkAccessManager();
+    long long timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    // Generate signature
+    QMap<QString,QVariant> params;
+    params.insert("timestamp",timestamp);
+    params.insert("file",QVariant(publicImageUrl));
+    params.insert("api_key",GlobalSettings::getInstance()->getCloudinaryApiKey());
+    QString signature = generateSignature(params,GlobalSettings::getInstance()->getCloudinaryApiSecret());
+    // Add signature to the params
+    params.insert("signature",signature);
+    // Construct POST
+    QUrlQuery postData = Helpers::generateUrlQueryFromVarMap(params);
+    QNetworkRequest request(Cloudinary::getUploadEndpoint());
+    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+    netManager->post(request,postData.toString(QUrl::FullyEncoded).toUtf8());
+}
+
+QString Cloudinary::getUploadEndpoint(){
+    return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName()  + "/auto/upload";
+}
