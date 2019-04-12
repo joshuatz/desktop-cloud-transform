@@ -13,6 +13,11 @@ struct UploadActionResult {
         url(url),
         id(id)
     {}
+    // Need to use Q_GADGET so members can be understood across meta registration
+    Q_GADGET
+        Q_PROPERTY(bool success MEMBER success)
+        Q_PROPERTY(QString url MEMBER url)
+        Q_PROPERTY(QString id MEMBER id)
 };
 
 class Uploader : public QObject
@@ -36,7 +41,7 @@ private:
     bool m_uploadInProgress = false;
     int m_processingIndex = 0;
     int m_processingQueueLength = 0;
-    UploadActionResult m_lastUploadActionResult;
+    UploadActionResult m_lastUploadActionResult = UploadActionResult();
     static Uploader *m_instance;
 };
 

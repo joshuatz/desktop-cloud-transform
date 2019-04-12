@@ -10,5 +10,8 @@
         <file>qml/forms/SettingsEditor.qml</file>
         <file>qml/ThemeColors.qml</file>
         <file>qml/qmldir</file>
+        <file>qml/animated/Toast.qml</file>
+        <file>qml/animated/ToastManager.qml</file>
+        <file>qml/forms/UploadSuccess.qml</file>
     </qresource>
 </RCC>

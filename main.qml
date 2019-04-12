@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
 import QtQuick.Controls.impl 2.0
+import "./qml/animated"
 import "./qml/components"
 import "./qml/forms"
 import "./qml"
@@ -36,6 +37,7 @@ ApplicationWindow {
     // Bottom Bar - area to drop file to upload
     BottomBar {
         id: bottomBar
+        globalToastManager: globalToastManager
         width: parent.width
         anchors.bottom: parent.bottom
         background: ThemeColors.darkPrimary
@@ -117,6 +119,35 @@ ApplicationWindow {
             }
         }
     }
+    // Success modal - popup with fields to copy to clipboard, info, etc.
+    Popup {
+        id: uploadSuccessModal
+        property var uploadResult: Uploader.lastUploadActionResult
+        anchors.centerIn: parent
+        width: parent.width - 50
+        height: parent.height - 50
+        modal: true
+        dim: true
+        background: Rectangle {
+            color: ThemeColors.darkPrimary
+        }
+        contentItem: UploadSuccess {
+            uploadResult: uploadSuccessModal.uploadResult
+            anchors.fill: parent
+            closeFunction: (function(){
+                uploadSuccessModal.close();
+            })
+        }
+        visible: true
+    }
+
+    // Global toast manager
+    ToastManager {
+        id: globalToastManager
+        verticalLayoutDirection: ListView.TopToBottom
+        spacing: 20
+        anchors.topMargin: root.height * 0.4
+    }
 
     // Attaching some signals to the top level app window
     property bool uploadInProgress: Uploader.uploadInProgress
@@ -124,7 +155,31 @@ ApplicationWindow {
         mainProgressBarModal.visible = root.uploadInProgress
         console.log("uploading changed");
     }
-    Component.onCompleted:{
-        console.log(root.uploadInProgress);
+    property var lastUploadResult: Uploader.lastUploadActionResult
+    onLastUploadResultChanged: {
+        console.log(JSON.stringify(root.lastUploadResult));
+        if (root.lastUploadResult.success){
+            uploadSuccessModal.uploadResult = root.lastUploadResult;
+            uploadSuccessModal.open();
+            delay(5000,function(){
+               uploadSuccessModal.close();
+            });
+
+        }
+        else {
+            // @TODO replace with animated toast
+            globalToastManager.show("Upload failed!");
+        }
+    }
+
+    Timer {
+        id: timer
+    }
+
+    function delay(delayTime, cb) {
+        timer.interval = delayTime;
+        timer.repeat = false;
+        timer.triggered.connect(cb);
+        timer.start();
     }
 }

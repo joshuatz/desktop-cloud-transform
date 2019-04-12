@@ -7,6 +7,7 @@ Item {
     id: root
     property alias background: dropAreaBackground.background
     property var globalProgressBarModal
+    property var globalToastManager
     DashedRectangle {
         id: dropAreaBackground
         background: "white"
@@ -34,8 +35,9 @@ Item {
                         Uploader.uploadImageFromLocalPath(filepath);
                     }
                     else {
-                        // @TODO popup message
+                        // @TODO popup message / nice toast
                         console.log("Non image dropped into droparea");
+                        globalToastManager.show("Non image dropped into droparea");
                     }
                 }
             }

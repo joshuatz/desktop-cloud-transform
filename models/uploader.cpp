@@ -1,6 +1,8 @@
 #include "uploader.h"
 #include "helpers.h"
 #include "apis/cloudinary.h"
+#include <QClipboard>
+#include <QGuiApplication>
 
 Uploader::Uploader(QObject *parent) : QObject(parent)
 {
@@ -37,6 +39,13 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
     }
     else {
         result.success = true;
+        QJsonObject jsonResult = QJsonObject(QJsonDocument::fromJson(data.toUtf8()).object());
+        // Parse the reply as JSON and map to result
+        result.url = jsonResult["url"].toString();
+        result.id = jsonResult["public_id"].toString();
+        // Copy url to clipboard
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        clipboard->setText(result.url);
     }
     // Push the result
     this->m_lastUploadActionResult = result;

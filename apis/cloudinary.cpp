@@ -55,7 +55,7 @@ void Cloudinary::uploadLocalFileByPath(QString localImagePath){
 void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
     QMimeDatabase mimeDb;
     Uploader *UploaderInstance = Uploader::getInstance();
-    bool mock = true;
+    bool mock = false;
 
     // check for timestamp
     if (params.contains("timestamp")==false){
