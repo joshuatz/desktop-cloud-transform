@@ -6,6 +6,7 @@ import "."
 Item {
     id: root
     property alias background: dropAreaBackground.background
+    property var globalProgressBarModal
     DashedRectangle {
         id: dropAreaBackground
         background: "white"

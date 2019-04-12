@@ -54,7 +54,8 @@ void Cloudinary::uploadLocalFileByPath(QString localImagePath){
 
 void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
     QMimeDatabase mimeDb;
-    bool mock = false;
+    Uploader *UploaderInstance = Uploader::getInstance();
+    bool mock = true;
 
     // check for timestamp
     if (params.contains("timestamp")==false){
@@ -76,7 +77,6 @@ void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
     QMap<QString,QVariant>::iterator i;
     for (i = params.begin(); i != params.end(); ++i){
-        bool keyValIsString = i.value().type()==QVariant::String || i.value().type() == QMetaType::QString;
         if ((i.key()=="filepath" && params.contains("file")==false) || (i.key()=="file" && i.value().type() == QVariant::String && Helpers::checkValidImageFilePath(i.value().toString()))){
             // Let other funcs pass file as a filepath string instead of raw file
             QString filePath = i.value().toString();
@@ -107,6 +107,7 @@ void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
         }
     }
     qDebug() << "About to make POST to Cloudinary with form-data";
+    Uploader::getInstance()->setUploadInProgress(true);
     QNetworkAccessManager *netManager = new QNetworkAccessManager();
     QNetworkRequest request;
     if (mock){
@@ -118,28 +119,31 @@ void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
     QNetworkReply *reply = netManager->post(request, multiPart);
     // Set up connect to listen for result
     // Use lambda as receiver with connect to get result of network finished event
+    // For right now, using Lambda to connect() instead of actual QObject::connect due to issue with static method. @TODO
     QObject::connect(netManager,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
         if (finishedReply->error()){
             qDebug() << "FAIL!";
-            qDebug() << (QString) request.url().toString();
             qDebug() << (QString) finishedReply->readAll();
         }
         else {
             qDebug() << "image uploaded";
         }
+        Uploader::getInstance()->receiveNetworkReply(finishedReply);
     });
-//    QObject::connect(reply,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
-//        if (finishedReply->error()){
-//            qDebug() << "FAIL!";
-//        }
-//        else {
-//            qDebug() << "image uploaded";
-//        }
-//    });
 
-    Uploader uploader;
-//    QObject::connect(&netManager,SIGNAL(finished()),&uploader,SLOT(uploader.receiveNetworkReply()));
-    QObject::connect(reply,SIGNAL(finished()),&uploader,SLOT(Uploader::receiveNetworkReply()));
+
+    // Static version - works, but the slot has to be a static method
+    //QObject::connect(netManager,&QNetworkAccessManager::finished,&Uploader::receiveNetworkReply);
+    // Not working
+//    QObject::connect(reply,SIGNAL(finished()),Uploader::getInstance(),Uploader::getInstance()->receiveNetworkReply(reply));
+    //Lets try simple version
+    // This should work but doesnt...
+//    QObject::connect(reply,&QNetworkAccessManager::finished,Uploader::getInstance()->receiveNetworkReply);
+//    QObject::connect(reply,SIGNAL(finished()),&uploader,SLOT(Uploader::receiveNetworkReply()));
+    // Close?
+//    QObject::connect(reply,SIGNAL(finished()),UploaderInstance,SLOT(UploaderInstance->receiveNetworkReply(QNetworkReply)));
+    // asfdasfd
+//    QObject::connect(netManager,&QNetworkAccessManager::finished,UploaderInstance,UploaderInstance->receiveNetworkReply);
     // Actually make the request
     //QNetworkReply *reply = netManager.post(request, multiPart);
     qDebug() << reply;
