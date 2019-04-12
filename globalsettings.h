@@ -16,6 +16,7 @@ struct settingDbResult {
 class GlobalSettings : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString cloudinaryCloudName MEMBER m_cloudinaryCloudName NOTIFY settingsChanged)
 public:
     explicit GlobalSettings(QObject *parent = nullptr);
     static GlobalSettings *getInstance();

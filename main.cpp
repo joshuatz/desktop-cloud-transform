@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QQmlContext>
 #include "helpers.h"
 #include "database.h"
 #include "globalsettings.h"
@@ -13,16 +14,15 @@ int main(int argc, char *argv[])
     // Load global settings into memory
     GlobalSettings::getInstance()->loadFromStorage();
 
-
-
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     QGuiApplication app(argc, argv);
-
     QQmlApplicationEngine engine;
 
     // Set Material theme for QTQuickControls
     QQuickStyle::setStyle("Material");
+
+    // Register contexts
+    engine.rootContext()->setContextProperty("GlobalSettings",GlobalSettings::getInstance());
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())

@@ -35,6 +35,7 @@ bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinar
         m_cloudinaryCloudName = cloudinaryCloudName;
         m_cloudinaryApiKey = cloudinaryApiKey;
         m_cloudinaryApiSecret = cloudinaryApiSecret;
+        this->saveToStorage();
         emit settingsChanged();
     }
     return validated;
@@ -42,11 +43,16 @@ bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinar
 
 void GlobalSettings::loadFromStorage(){
     // @TODO
+    m_cloudinaryCloudName = getSettingStringFromDb("cloudinaryCloudName").value;
     m_cloudinaryApiKey = getSettingStringFromDb("cloudinaryApiKey").value;
+    m_cloudinaryApiSecret = getSettingStringFromDb("cloudinaryApiSecret").value;
 }
 
 void GlobalSettings::saveToStorage(){
     // @TODO
+    saveSettingStringToDb("cloudinaryCloudName",this->m_cloudinaryCloudName);
+    saveSettingStringToDb("cloudinaryApiKey",this->m_cloudinaryApiKey);
+    saveSettingStringToDb("cloudinaryApiSecret",this->m_cloudinaryApiSecret);
 }
 
 settingDbResult GlobalSettings::getSettingStringFromDb(QString settingKey){
