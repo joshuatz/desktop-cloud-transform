@@ -28,6 +28,7 @@ HEADERS += \
 RESOURCES += qml.qrc
 
 include("models/models.pri")
+include("apis/apis.pri")
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

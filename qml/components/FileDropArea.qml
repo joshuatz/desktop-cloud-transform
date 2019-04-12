@@ -21,12 +21,10 @@ Item {
                     color: "white"
                 }
             }
-
-//            MouseArea {
-//                id: hoverArea
-//                anchors.fill: parent
-//                hoverEnabled: true
-//            }
+            onDropped: {
+                var dropEvent = drop;
+                console.log(drop);
+            }
         }
     }
 }

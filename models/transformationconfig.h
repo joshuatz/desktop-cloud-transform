@@ -3,15 +3,18 @@
 
 #include <QObject>
 
-class TransformationConfig : public QObject
+class TransformationConfig
 {
-    Q_OBJECT
 public:
-    explicit TransformationConfig(QObject *parent = nullptr);
+    TransformationConfig();
+    enum ConfigDestination {
+        CLOUDINARY
+    };
+    ConfigDestination destination = CLOUDINARY;
+    long long id;
 
-signals:
+private:
 
-public slots:
 };
 
 #endif // TRANSFORMATIONCONFIG_H

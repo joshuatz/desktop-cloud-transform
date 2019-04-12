@@ -5,6 +5,7 @@
 #include "helpers.h"
 #include "database.h"
 #include "globalsettings.h"
+#include "apis/cloudinary.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,10 @@ int main(int argc, char *argv[])
 
     // Set Material theme for QTQuickControls
     QQuickStyle::setStyle("Material");
+
+//    QMap<QString,QVariant> paramMap;
+//    paramMap.insert("TestKeyProp",QVariant("Test key val"));
+//    qDebug() << Cloudinary::generateSignature(paramMap,"fakeapikey");
 
     // Register contexts
     engine.rootContext()->setContextProperty("GlobalSettings",GlobalSettings::getInstance());
