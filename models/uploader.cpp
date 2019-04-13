@@ -41,7 +41,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
         result.success = true;
         QJsonObject jsonResult = QJsonObject(QJsonDocument::fromJson(data.toUtf8()).object());
         // Parse the reply as JSON and map to result
-        result.url = jsonResult["url"].toString();
+        result.url = jsonResult["secure_url"].toString();
         result.id = jsonResult["public_id"].toString();
         // Copy url to clipboard
         QClipboard *clipboard = QGuiApplication::clipboard();

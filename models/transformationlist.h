@@ -2,6 +2,7 @@
 #define TRANSFORMATIONLIST_H
 
 #include <QObject>
+#include <QMap>
 #include "transformationconfig.h"
 
 class TransformationList : public QObject
@@ -11,14 +12,18 @@ class TransformationList : public QObject
 public:
     explicit TransformationList(QObject *parent = nullptr);
     typedef QList<TransformationConfig> transformationConfigList;
+    QMap<long long,TransformationConfig> transformationConfigListById;
     TransformationList::transformationConfigList list;
 signals:
     void transformationsChanged();
 public slots:
-    void loadFromStorage();
-    void saveToStorage();
+    void loadAllFromStorage();
+    void saveAllToStorage();
+    long long saveNewToStorage(TransformationConfig newConfig);
+    void updateExistingInStorage();
     TransformationList::transformationConfigList getDefaults();
 private:
+    static const QString TABLENAME;
 };
 
 #endif // TRANSFORMATIONLIST_H

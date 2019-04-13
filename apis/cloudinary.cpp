@@ -54,7 +54,6 @@ void Cloudinary::uploadLocalFileByPath(QString localImagePath){
 
 void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
     QMimeDatabase mimeDb;
-    Uploader *UploaderInstance = Uploader::getInstance();
     bool mock = false;
 
     // check for timestamp
@@ -117,35 +116,10 @@ void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
         request = QNetworkRequest(Cloudinary::getUploadEndpoint("image"));
     }
     QNetworkReply *reply = netManager->post(request, multiPart);
+
     // Set up connect to listen for result
-    // Use lambda as receiver with connect to get result of network finished event
-    // For right now, using Lambda to connect() instead of actual QObject::connect due to issue with static method. @TODO
-    QObject::connect(netManager,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
-        if (finishedReply->error()){
-            qDebug() << "FAIL!";
-            qDebug() << (QString) finishedReply->readAll();
-        }
-        else {
-            qDebug() << "image uploaded";
-        }
-        Uploader::getInstance()->receiveNetworkReply(finishedReply);
-    });
+    QObject::connect(netManager,&QNetworkAccessManager::finished,Uploader::getInstance(),&Uploader::receiveNetworkReply);
 
-
-    // Static version - works, but the slot has to be a static method
-    //QObject::connect(netManager,&QNetworkAccessManager::finished,&Uploader::receiveNetworkReply);
-    // Not working
-//    QObject::connect(reply,SIGNAL(finished()),Uploader::getInstance(),Uploader::getInstance()->receiveNetworkReply(reply));
-    //Lets try simple version
-    // This should work but doesnt...
-//    QObject::connect(reply,&QNetworkAccessManager::finished,Uploader::getInstance()->receiveNetworkReply);
-//    QObject::connect(reply,SIGNAL(finished()),&uploader,SLOT(Uploader::receiveNetworkReply()));
-    // Close?
-//    QObject::connect(reply,SIGNAL(finished()),UploaderInstance,SLOT(UploaderInstance->receiveNetworkReply(QNetworkReply)));
-    // asfdasfd
-//    QObject::connect(netManager,&QNetworkAccessManager::finished,UploaderInstance,UploaderInstance->receiveNetworkReply);
-    // Actually make the request
-    //QNetworkReply *reply = netManager.post(request, multiPart);
     qDebug() << reply;
     //multiPart->setParent(reply); // delete the multiPart with the reply
 }

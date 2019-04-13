@@ -1,5 +1,7 @@
 #include "transformationlist.h"
 
+const QString TransformationList::TABLENAME = "transformationconfigs";
+
 TransformationList::TransformationList(QObject *parent) : QObject(parent)
 {
 
@@ -14,11 +16,20 @@ TransformationList::transformationConfigList TransformationList::getDefaults(){
     return defaults;
 }
 
-void TransformationList::loadFromStorage(){
+void TransformationList::loadAllFromStorage(){
     // @TODO
 }
 
-void TransformationList::saveToStorage(){
+void TransformationList::saveAllToStorage(){
+    // @TODO
+}
+
+long long TransformationList::saveNewToStorage(TransformationConfig newConfig){
+    // @TODO
+    return 1;
+}
+
+void TransformationList::updateExistingInStorage(){
     // @TODO
 }
 

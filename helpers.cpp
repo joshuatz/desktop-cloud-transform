@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QImageReader>
 #include <QtNetwork>
+#include <QGuiApplication>
+#include <QClipboard>
 
 Helpers::Helpers(QObject *parent) : QObject(parent)
 {
@@ -43,4 +45,9 @@ QUrlQuery Helpers::generateUrlQueryFromVarMap(QMap<QString, QVariant> params){
         query.addQueryItem(i.key(),i.value().toString());
     }
     return query;
+}
+
+void Helpers::copyToClipboard(QString strToCopy){
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setText(strToCopy);
 }
