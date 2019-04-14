@@ -15,5 +15,6 @@
         <file>qml/forms/UploadSuccess.qml</file>
         <file>assets/baseline-edit-24px.svg</file>
         <file>assets/baseline-folder_open-24px.svg</file>
+        <file>qml/components/ImageFilePicker.qml</file>
     </qresource>
 </RCC>
