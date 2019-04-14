@@ -11,15 +11,20 @@ public:
         CLOUDINARY
     };
     ConfigDestination destination = CLOUDINARY;
-    long long id;
+    int id = -1;
+    QString userDefinedName = "";
     bool usesPreset = false;
     QString presetName = "";
     bool usesTransformationRawString = false;
     QString transformationRawString = "";
     bool storeOriginal = false;
     bool deleteCloudCopyAfterDownload = false;
-    Q_GADGET
-        Q_PROPERTY(long long id MEMBER id)
+    // Needed for MOC
+    bool operator==(TransformationConfig const &other) const;
+    bool operator!=(TransformationConfig const &other) const;
+Q_GADGET
+    Q_PROPERTY(int id MEMBER id)
+    Q_PROPERTY(QString userDefinedName MEMBER userDefinedName)
 private:
 
 };

@@ -138,7 +138,7 @@ ApplicationWindow {
                 uploadSuccessModal.close();
             })
         }
-        visible: true
+        visible: false
     }
 
     // Global toast manager

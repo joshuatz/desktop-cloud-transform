@@ -6,21 +6,28 @@ import "."
 Item {
     id: root
     property alias background: dropAreaBackground.background
+    property alias outerBorderColor: dropAreaBackground.outerBorderColor
+    property alias dashedBorderColor: dropAreaBackground.dashedBorderColor
     property var globalProgressBarModal
     property var globalToastManager
+    property string backgroundText: "Drop to Upload"
+    property alias backgroundTextColor: backgoundText.color
     DashedRectangle {
         id: dropAreaBackground
         background: "white"
+        outerBorderColor: "black"
+        dashedBorderColor: "black"
         anchors.fill: parent
         DropArea {
             anchors.fill: parent
             Rectangle {
                 anchors.centerIn: parent
                 Text {
-                    text: qsTr("Drop to Upload")
+                    id: backgoundText
+                    text: qsTr(root.backgroundText)
                     anchors.centerIn: parent
                     opacity: 0.5
-                    color: "white"
+                    color: "black"
                 }
             }
             onDropped: {

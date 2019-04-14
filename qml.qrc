@@ -13,5 +13,7 @@
         <file>qml/animated/Toast.qml</file>
         <file>qml/animated/ToastManager.qml</file>
         <file>qml/forms/UploadSuccess.qml</file>
+        <file>assets/baseline-edit-24px.svg</file>
+        <file>assets/baseline-folder_open-24px.svg</file>
     </qresource>
 </RCC>

@@ -7,6 +7,8 @@
 #include "globalsettings.h"
 #include "models/uploader.h"
 #include "apis/cloudinary.h"
+#include "models/transformationlist.h"
+#include "models/transformationconfig.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +17,8 @@ int main(int argc, char *argv[])
 
     // Load global settings into memory
     GlobalSettings::getInstance()->loadFromStorage();
+    // Load configs
+    TransformationList::getInstance()->loadAllFromStorage();
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
@@ -23,10 +27,6 @@ int main(int argc, char *argv[])
     // Set Material theme for QTQuickControls
     QQuickStyle::setStyle("Material");
 
-//    QMap<QString,QVariant> paramMap;
-//    paramMap.insert("TestKeyProp",QVariant("Test key val"));
-//    qDebug() << Cloudinary::generateSignature(paramMap,"fakeapikey");
-
     // Create class instances
     Helpers myHelpers;
 
@@ -34,9 +34,10 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("GlobalSettings",GlobalSettings::getInstance());
     engine.rootContext()->setContextProperty("Helpers",&myHelpers);
     engine.rootContext()->setContextProperty("Uploader",Uploader::getInstance());
-
+    engine.rootContext()->setContextProperty("UploadConfigsList",TransformationList::getInstance());
     // Register metatypes
     qRegisterMetaType<UploadActionResult>();
+    qRegisterMetaType<TransformationConfig>();
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
