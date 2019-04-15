@@ -2,7 +2,9 @@
 #define UPLOADER_H
 
 #include <QObject>
+#include <QFile>
 #include <QtNetwork>
+#include "transformationconfig.h"
 
 struct UploadActionResult {
     bool success;
@@ -37,12 +39,18 @@ public slots:
     int uploadImageFromLocalPath(QString localImageFilePath);
     void receiveNetworkReply(QNetworkReply *reply);
     void setUploadInProgress(bool uploadInProgressStatus);
+    void uploadImageWithConfig(QString localImageFilePath,TransformationConfig config);
+    void uploadImageWithConfigId(QString localImageFilePath,int configId);
 private:
     bool m_uploadInProgress = false;
     int m_processingIndex = 0;
     int m_processingQueueLength = 0;
     UploadActionResult m_lastUploadActionResult = UploadActionResult();
     static Uploader *m_instance;
+    bool m_hasAttachedConfig = false;
+    TransformationConfig m_attachedConfig;
+    bool m_attachedConfigIsInProgress = false;
+    QString m_localFilePath;
 };
 
 Q_DECLARE_METATYPE(UploadActionResult);

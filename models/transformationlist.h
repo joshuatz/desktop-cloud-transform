@@ -20,8 +20,9 @@ public:
     typedef QMap<int,QVariant> configVariantMapByIdType;
     static QMap<int,TransformationConfig> configMapById;
     static QMap<int,QVariant> configVariantMapById;
-
     static QVariantList getConfigListAsVariantList();
+    static TransformationConfig getConfigById(int id);
+    static QMap<QString,QVariant> configToParams(TransformationConfig config);
 signals:
     void transformationsChanged();
 public slots:

@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QVariant>
 #include <QtNetwork>
+#include "models/uploader.h"
 
 class Cloudinary
 {
@@ -15,6 +16,9 @@ public:
     static void uploadLocalFileByPath(QString localImagePath);
     static void uploadFileByString(QString fileString);
     static void uploadFileByParams(QMap<QString,QVariant> params);
+    static void uploadFileByParamsWUploaderInstance(QMap<QString,QVariant> params,Uploader *uploaderInstance);
+    static QString generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config);
+    typedef QMap<QString,QVariant> cloudinaryParams;
 private:
     static QString getUploadEndpoint(QString resourceType);
 };

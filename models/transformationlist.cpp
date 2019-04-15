@@ -57,8 +57,10 @@ int TransformationList::saveNewToStorage(TransformationConfig newConfig){
     bool res = false;
     if (Database::connected){
         QSqlQuery insertQuery;
-        insertQuery.prepare(QStringList({"INSERT INTO ",TransformationList::TABLENAME," (user_defined_name,uses_preset,preset_name,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(:user_defined_name,:uses_preset,:preset_name,;uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)"}).join(""));
+        insertQuery.prepare(QStringList({"INSERT INTO ",TransformationList::TABLENAME," (user_defined_name,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(:user_defined_name,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,;uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)"}).join(""));
         insertQuery.bindValue(":user_defined_name",newConfig.userDefinedName);
+        insertQuery.bindValue(":overwrite_local",newConfig.overwriteLocalFile);
+        insertQuery.bindValue(":created_file_suffix",newConfig.createdFileSuffix);
         insertQuery.bindValue(":uses_preset",newConfig.usesPreset);
         insertQuery.bindValue(":preset_name",newConfig.presetName);
         insertQuery.bindValue(":uses_trans_string",newConfig.usesTransformationRawString);
@@ -81,6 +83,8 @@ TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord
     TransformationConfig result;
     result.id = row.value("id").toInt();
     result.userDefinedName = row.value("user_defined_name").toString();
+    result.overwriteLocalFile = row.value("overwrite_local").toBool();
+    result.createdFileSuffix = row.value("created_file_suffix").toString();
     result.usesPreset = row.value("uses_preset").toBool();
     result.presetName = row.value("preset_name").toString();
     result.usesTransformationRawString = row.value("uses_trans_string").toBool();
@@ -92,4 +96,30 @@ TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord
 
 QVariantList TransformationList::getConfigListAsVariantList(){
     return TransformationList::configVariantMapById.values();
+}
+
+TransformationConfig TransformationList::getConfigById(int id){
+    TransformationConfig config;
+    if (Database::connected){
+        QSqlQueryModel queryModel;
+        queryModel.setQuery(QStringList({"SELECT * FROM ",TransformationList::TABLENAME," WHERE ",TransformationList::TABLENAME,".id = ",QString::number(id)}).join(""));
+        if (queryModel.rowCount() > 0){
+            QSqlRecord currRecord = queryModel.record(0);
+            config = TransformationList::sqlRowToTransformationConfig(currRecord);
+        }
+    }
+    return config;
+}
+
+QMap<QString,QVariant> TransformationList::configToParams(TransformationConfig config){
+    // @TODO
+    QMap<QString,QVariant> params;
+    if (config.usesPreset){
+        // If using a named preset, ignore manual trans string
+        params.insert("upload_preset",QVariant(config.presetName));
+    }
+    else if (config.usesTransformationRawString) {
+        //
+    }
+    return params;
 }

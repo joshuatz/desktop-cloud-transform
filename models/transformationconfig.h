@@ -13,6 +13,8 @@ public:
     ConfigDestination destination = CLOUDINARY;
     int id = -1;
     QString userDefinedName = "";
+    bool overwriteLocalFile = false;
+    QString createdFileSuffix = "";
     bool usesPreset = false;
     QString presetName = "";
     bool usesTransformationRawString = false;

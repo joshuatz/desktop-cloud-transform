@@ -31,6 +31,8 @@ void Helpers::checkInternetConnection(bool *res){
 }
 
 bool Helpers::checkValidImageFilePath(QString imagePath){
+    // @TODO combine with additonal check of MIME type and generic can-access-file check.
+    // Currently failing if image extension != detected mime type
     QImageReader reader(imagePath);
     if (reader.canRead()){
         return true;
