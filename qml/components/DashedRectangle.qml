@@ -7,6 +7,7 @@ Item {
     property alias background: rect.color
     property alias outerBorderColor: root.outerBorderColor
     property alias dashedBorderColor: root.dashedBorderColor
+    property alias rect: rect
     property color outerBorderColor: "black"
     property color dashedBorderColor: "black"
     width: 400

@@ -16,13 +16,13 @@ Item {
         icon.source: "qrc:/assets/baseline-help_outline-24px.svg"
         ToolTip.text: root.helpText
         ToolTip.visible: buttonHoverArea.containsMouse
-        onClicked: {
-            helpDialog.open();
-        }
         MouseArea {
             id: buttonHoverArea
             hoverEnabled: true
             anchors.fill: parent
+            onClicked: {
+                helpDialog.open();
+            }
         }
     }
 
