@@ -161,7 +161,10 @@ QString Cloudinary::generateImageUrlFromConfigAndId(QString uploadedPublicId, Tr
     // Construct the base URL
     QString publicUrl = "https://res.cloudinary.com/" + GlobalSettings::getInstance()->getCloudinaryCloudName() + "/image/upload/";
     if (config.usesPreset){
-        publicUrl += "t_" + config.presetName;
+        // This can only be used with uploads, not with public URLs
+    }
+    else if (config.usesNamedTransformation){
+        publicUrl += "t_" + config.namedTransformation + "/";
     }
     else if (config.usesTransformationRawString){
         publicUrl += config.transformationRawString;

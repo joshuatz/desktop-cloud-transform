@@ -57,12 +57,15 @@ int TransformationList::saveNewToStorage(TransformationConfig newConfig){
     bool res = false;
     if (Database::connected){
         QSqlQuery insertQuery;
-        insertQuery.prepare(QStringList({"INSERT INTO ",TransformationList::TABLENAME," (user_defined_name,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(:user_defined_name,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,;uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)"}).join(""));
+        insertQuery.prepare(QStringList({"INSERT INTO ",TransformationList::TABLENAME," (user_defined_name,save_locally,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_named_trans,named_trans,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(:user_defined_name,:save_locally,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,:uses_named_trans,:named_trans,:uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)"}).join(""));
         insertQuery.bindValue(":user_defined_name",newConfig.userDefinedName);
+        insertQuery.bindValue(":save_locally",newConfig.saveLocally);
         insertQuery.bindValue(":overwrite_local",newConfig.overwriteLocalFile);
         insertQuery.bindValue(":created_file_suffix",newConfig.createdFileSuffix);
         insertQuery.bindValue(":uses_preset",newConfig.usesPreset);
         insertQuery.bindValue(":preset_name",newConfig.presetName);
+        insertQuery.bindValue(":uses_named_trans",newConfig.usesNamedTransformation);
+        insertQuery.bindValue(":named_trans",newConfig.namedTransformation);
         insertQuery.bindValue(":uses_trans_string",newConfig.usesTransformationRawString);
         insertQuery.bindValue(":trans_string",newConfig.transformationRawString);
         insertQuery.bindValue(":store_original",newConfig.storeOriginal);
@@ -83,10 +86,13 @@ TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord
     TransformationConfig result;
     result.id = row.value("id").toInt();
     result.userDefinedName = row.value("user_defined_name").toString();
+    result.saveLocally = row.value("save_locally").toBool();
     result.overwriteLocalFile = row.value("overwrite_local").toBool();
     result.createdFileSuffix = row.value("created_file_suffix").toString();
     result.usesPreset = row.value("uses_preset").toBool();
     result.presetName = row.value("preset_name").toString();
+    result.usesNamedTransformation = row.value("uses_named_trans").toBool();
+    result.namedTransformation = row.value("named_trans").toString();
     result.usesTransformationRawString = row.value("uses_trans_string").toBool();
     result.transformationRawString = row.value("trans_string").toString();
     result.storeOriginal = row.value("store_original").toBool();

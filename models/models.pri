@@ -4,7 +4,8 @@ HEADERS += \
     $$PWD/stats.h \
     $$PWD/uploader.h \
     $$PWD/statsaction.h \
-    $$PWD/downloader.h
+    $$PWD/downloader.h \
+    $$PWD/uploadactionresult.h
 
 SOURCES += \
     $$PWD/transformationlist.cpp \
@@ -12,4 +13,5 @@ SOURCES += \
     $$PWD/stats.cpp \
     $$PWD/uploader.cpp \
     $$PWD/statsaction.cpp \
-    $$PWD/downloader.cpp
+    $$PWD/downloader.cpp \
+    $$PWD/uploadactionresult.cpp

@@ -13,10 +13,13 @@ public:
     ConfigDestination destination = CLOUDINARY;
     int id = -1;
     QString userDefinedName = "";
+    bool saveLocally = true;
     bool overwriteLocalFile = false;
     QString createdFileSuffix = "";
     bool usesPreset = false;
     QString presetName = "";
+    bool usesNamedTransformation = false;
+    QString namedTransformation = "";
     bool usesTransformationRawString = false;
     QString transformationRawString = "";
     bool storeOriginal = false;
@@ -27,6 +30,10 @@ public:
 Q_GADGET
     Q_PROPERTY(int id MEMBER id)
     Q_PROPERTY(QString userDefinedName MEMBER userDefinedName)
+    Q_PROPERTY(bool saveLocally MEMBER saveLocally)
+    Q_PROPERTY(bool overwriteLocalFile MEMBER overwriteLocalFile)
+    Q_PROPERTY(bool storeOriginal MEMBER storeOriginal)
+    Q_PROPERTY(bool deleteCloudCopyAfterDownload MEMBER deleteCloudCopyAfterDownload)
 private:
 
 };

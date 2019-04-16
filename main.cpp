@@ -39,6 +39,11 @@ int main(int argc, char *argv[])
     qRegisterMetaType<UploadActionResult>();
     qRegisterMetaType<TransformationConfig>();
 
+    // Register settings config
+    QCoreApplication::setOrganizationName("JoshuaTzucker");
+    QCoreApplication::setOrganizationDomain("joshuatz.com");
+    QCoreApplication::setApplicationName("Desktop Cloud Transform");
+
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;

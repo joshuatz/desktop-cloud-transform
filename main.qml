@@ -132,13 +132,15 @@ ApplicationWindow {
             color: ThemeColors.darkPrimary
         }
         contentItem: UploadSuccess {
-            uploadResult: uploadSuccessModal.uploadResult
+//            uploadResult: uploadSuccessModal.uploadResult
+            uploadResult: Uploader.mockUploadResult("withConfigSaveLocal")
+            globalToastManager: globalToastManager
             anchors.fill: parent
             closeFunction: (function(){
                 uploadSuccessModal.close();
             })
         }
-        visible: false
+        visible: true
     }
 
     // Global toast manager

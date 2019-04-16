@@ -27,6 +27,25 @@ void Uploader::uploadImageWithConfigId(QString localImageFilePath,int configId){
     this->uploadImageWithConfig(localImageFilePath,config);
 }
 
+UploadActionResult Uploader::mockUploadResult(QString type){
+    UploadActionResult result;
+    result.success = type!="fail";
+    if (type=="withConfigSaveLocal" || type=="withConfig"){
+        result.hasAttachedConfig = true;
+        result.attachedConfig = TransformationConfig();
+        if (type=="withConfigSaveLocal"){
+            result.attachedConfig.saveLocally = true;
+            result.localSavePath = "C:/Users/Joshua/Downloads/Temp/TRUETEMP/tmb9BkG.jpg";
+        }
+        else {
+            result.attachedConfig.saveLocally = false;
+            result.url = "https://cloudinary-res.cloudinary.com/image/upload/c_scale,w_200/v1538584137/cloudinary_logo_for_black_bg.png";
+        }
+    }
+    return result;
+
+}
+
 void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationConfig config){
     QMap<QString,QVariant> params;
     params.insert("filepath",localImageFilePath);
@@ -47,6 +66,11 @@ void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationCo
         // This is the final upload action.
         if (config.usesPreset){
             params.insert("upload_preset",QVariant(config.presetName));
+        }
+        else if (config.usesNamedTransformation){
+            // Named transformations use normal chain syntax, but just insert as "t_NAMEOFTRANSFORMATION"
+            QString transString = "t_" + config.namedTransformation;
+            params.insert("transformation",QVariant(transString));
         }
         else if (config.usesTransformationRawString){
             params.insert("transformation",QVariant(config.transformationRawString));
@@ -71,7 +95,13 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
     qDebug() << "Running in slot of Uploader class!";
     QString data = (QString) reply->readAll();
     qDebug() << data;
+
     UploadActionResult result;
+    result.hasAttachedConfig = this->m_hasAttachedConfig;
+    if (result.hasAttachedConfig){
+        result.attachedConfig = this->m_attachedConfig;
+    }
+
     if (reply->error()){
         result.success = false;
         qDebug() << "network reply error!";
@@ -91,12 +121,12 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
             QString finalImageUrlToDownload = result.url;
             TransformationConfig config = this->m_attachedConfig;
 
-            if (this->m_uploadInProgress==true){
+            if (this->m_attachedConfigIsInProgress==true){
                 // We need to take the upload result and use for further processing
                 // We should be able to just construct a URL string from the previously uploaded result, and the transformation part of the config
                 QString computedFinalImageUrl = Cloudinary::generateImageUrlFromConfigAndId(result.id,config);
                 finalImageUrlToDownload = computedFinalImageUrl;
-                this->m_uploadInProgress = false;
+                this->m_attachedConfigIsInProgress = false;
             }
 
             else {
@@ -104,22 +134,24 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                 // Example of when this hits: Upload with a transformation config, but store_original = off - so image is directly uploaded with transformation
                 // Just need to download... shouldn't need to do anything else here.
             }
-
-            QFileInfo fileInfo = QFileInfo(this->m_localFilePath);
-            QString pathToSaveFileTo = this->m_localFilePath;
-            if (config.overwriteLocalFile == false){
-                QString createdFileSuffix = config.createdFileSuffix!="" ? config.createdFileSuffix : "_dct";
-                pathToSaveFileTo = fileInfo.absolutePath() + fileInfo.baseName() + createdFileSuffix;
-                if (fileInfo.completeSuffix()!=""){
-                    pathToSaveFileTo += "." + fileInfo.completeSuffix();
+            if (config.saveLocally){
+                QFileInfo fileInfo = QFileInfo(this->m_localFilePath);
+                QString pathToSaveFileTo = this->m_localFilePath;
+                if (config.overwriteLocalFile == false){
+                    QString createdFileSuffix = config.createdFileSuffix!="" ? config.createdFileSuffix : "_dct";
+                    pathToSaveFileTo = fileInfo.absolutePath() + "/" + fileInfo.baseName() + createdFileSuffix;
+                    if (fileInfo.completeSuffix()!=""){
+                        pathToSaveFileTo += "." + fileInfo.completeSuffix();
+                    }
                 }
-            }
 
-            // Actually download the file to disk
-            Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
+                // Actually download the file to disk
+                qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
+                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
 
-            if (config.deleteCloudCopyAfterDownload){
-                // @TODO
+                if (config.deleteCloudCopyAfterDownload){
+                    // @TODO
+                }
             }
         }
         else {
@@ -131,6 +163,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
     // Push the result
     this->m_lastUploadActionResult = result;
+    Uploader::getInstance()->m_lastUploadActionResult = result;
     emit this->uploadActionResultReceived();
     // Finally, regardless of actual reply, close out the pending upload - this will also emit
     this->setUploadInProgress(false);
