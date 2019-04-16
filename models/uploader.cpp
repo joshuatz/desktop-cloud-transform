@@ -30,12 +30,14 @@ void Uploader::uploadImageWithConfigId(QString localImageFilePath,int configId){
 UploadActionResult Uploader::mockUploadResult(QString type){
     UploadActionResult result;
     result.success = type!="fail";
+    result.id = "Pfj1C029Cj";
     if (type=="withConfigSaveLocal" || type=="withConfig"){
         result.hasAttachedConfig = true;
         result.attachedConfig = TransformationConfig();
         if (type=="withConfigSaveLocal"){
             result.attachedConfig.saveLocally = true;
-            result.localSavePath = "C:/Users/Joshua/Downloads/Temp/TRUETEMP/tmb9BkG.jpg";
+            result.localSavePath = "file:///C:/Users/Joshua/Downloads/Temp/TRUETEMP/tmb9BkG.jpg";
+            result.url = "https://cloudinary-res.cloudinary.com/image/upload/c_scale,w_200/v1538584137/cloudinary_logo_for_black_bg.png";
         }
         else {
             result.attachedConfig.saveLocally = false;

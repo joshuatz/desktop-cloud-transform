@@ -63,21 +63,27 @@ Item {
             anchors.topMargin: 20
             Text {
                 anchors.centerIn: parent
-                text: qsTr("URL has been copied to clipboard. Details below:")
+                text: qsTr(root.subTitle)
                 color: ThemeColors.darkPrimary
                 font.pixelSize: 20
             }
         }
         Loader {
-            id: imagePreviewArea
+            id: imagePreviewAreaLoader
+            property string imagePath: ""
+            anchors.top: mainMessage.bottom
+            anchors.topMargin: 14
+            width: parent.width
+            height: imagePreviewAreaLoader.visible ? 100 : 0
+            visible: false
         }
 
         Item {
             id: copyableFieldsContainer
             width: parent.width * 0.9
-            height: root.height - topBar.height - mainMessage.height
+            height: root.height - topBar.height - mainMessage.height - imagePreviewAreaLoader.height
             x: parent.width * 0.05
-            anchors.top: mainMessage.bottom
+            anchors.top: imagePreviewAreaLoader.bottom
             anchors.topMargin: 10
             ListView {
                 id: copyableFieldsListview
@@ -89,12 +95,12 @@ Item {
                     Item {
                         id: copyableFieldsDelegate
                         width: copyableFieldsListview.width
-                        height: 40
+                        height: 50
                         Row {
                             width: parent.width
                             height: parent.height
                             Rectangle {
-                                width: parent.width * 0.3
+                                width: parent.width * 0.2
                                 height: parent.height
                                 radius: 6
                                 Text {
@@ -104,23 +110,30 @@ Item {
                                 }
                             }
                             Item {
-                                width: parent.width * 0.1
+                                width: parent.width * 0.05
                                 height: parent.height
                             }
                             Rectangle {
-                                width: parent.width * 0.3
+                                width: parent.width * 0.6
                                 height: parent.height
                                 radius: 6
                                 TextInput {
                                     id: fieldValField
                                     text: fieldVal
-                                    readOnly: true
+                                    readOnly: false
                                     anchors.fill: parent
                                     anchors.margins: 6
+                                    wrapMode: Text.WordWrap
+                                    selectByMouse: true
+                                    layer.enabled: true
+                                    onTextChanged: {
+                                        // Reset to true value
+                                        fieldValField.text = fieldVal;
+                                    }
                                 }
                             }
                             Item {
-                                width: parent.width * 0.1
+                                width: parent.width * 0.05
                                 height: parent.height
                             }
                             Item {
@@ -154,23 +167,7 @@ Item {
 
 
 
-        // @TODO use listview and delegate to provide nice fields to copy paste out of
-        ListModel {
-            id: stringCopyFields
-            Component.onCompleted: {
-                // Create the elements
-                stringCopyFields.append([
-                    {
-                        "fieldName" : "URL",
-                        "fieldVal" : uploadResult.url
-                    },
-                    {
-                        "fieldName" : "id",
-                        "fieldVal" : uploadResult.id
-                    }
-                ])
-            }
-        }
+
         ListModel {
             id: conditionalCopyFields
             ListElement {
@@ -185,13 +182,39 @@ Item {
 //                conditionalCopyFields.append({})
             }
         }
-
-        Text {
-            anchors.top: mainMessage.bottom
-            anchors.topMargin: 50
-            text: root.uploadResult.url
-        }
     }
+
+    Component.onCompleted: {
+//        root.uploadResult = Uploader.mockUploadResult("withConfig");
+        root.uploadResult = Uploader.mockUploadResult("withConfigSaveLocal");
+        root.initModal();
+    }
+
+    property var initModal: (function(){
+        if (root.hasConfig){
+            var imageToDisplayPath = "";
+            if (root.attachedConfig.saveLocally){
+                imageToDisplayPath = root.uploadResult.localSavePath;
+                stringCopyFields.append([
+                    {
+                        "fieldName" : "Local File Path",
+                        "fieldVal" : root.uploadResult.localSavePath
+                    }
+                ]);
+            }
+            else {
+                imageToDisplayPath = root.uploadResult.url;
+            }
+            imagePreviewAreaLoader.visible = true;
+            imagePreviewAreaLoader.imagePath = imageToDisplayPath;
+            imagePreviewAreaLoader.sourceComponent = inlinePreviewImageComponent;
+        }
+    })
+
+
+    /**
+    * Hidden Elements
+    */
     ToastManager {
         id: localToastManager
         verticalLayoutDirection: ListView.TopToBottom
@@ -199,9 +222,37 @@ Item {
         anchors.topMargin: root.height * 0.4
     }
 
-    Component.onCompleted: {
-        console.log("Setting upload result to mock value");
-        JSON.stringify(Uploader.mockUploadResult("withConfigSaveLocal"));
-        root.uploadResult = Uploader.mockUploadResult("withConfigSaveLocal");
+    // @TODO use listview and delegate to provide nice fields to copy paste out of
+    ListModel {
+        id: stringCopyFields
+        Component.onCompleted: {
+            // Create the elements
+            stringCopyFields.append([
+                {
+                    "fieldName" : "URL",
+                    "fieldVal" : uploadResult.url
+                },
+                {
+                    "fieldName" : "id",
+                    "fieldVal" : uploadResult.id
+                }
+            ]);
+        }
+    }
+
+    Component {
+        id: inlinePreviewImageComponent
+        Rectangle {
+            width: imagePreviewAreaLoader.width
+            height: imagePreviewAreaLoader.height
+            color: Qt.rgba(0,0,0,0)
+            Image {
+                height: parent.height - 10
+                width: parent.width * 0.5
+                anchors.centerIn: parent
+                fillMode: Image.PreserveAspectFit
+                source: imagePreviewAreaLoader.imagePath
+            }
+        }
     }
 }
