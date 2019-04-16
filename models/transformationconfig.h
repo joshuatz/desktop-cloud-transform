@@ -32,6 +32,13 @@ Q_GADGET
     Q_PROPERTY(QString userDefinedName MEMBER userDefinedName)
     Q_PROPERTY(bool saveLocally MEMBER saveLocally)
     Q_PROPERTY(bool overwriteLocalFile MEMBER overwriteLocalFile)
+    Q_PROPERTY(QString createdFileSuffix MEMBER createdFileSuffix)
+    Q_PROPERTY(bool usesPreset MEMBER usesPreset)
+    Q_PROPERTY(QString presetName MEMBER presetName)
+    Q_PROPERTY(bool usesNamedTransformation MEMBER usesNamedTransformation)
+    Q_PROPERTY(QString namedTransformation MEMBER namedTransformation)
+    Q_PROPERTY(bool usesTransformationRawString MEMBER usesTransformationRawString)
+    Q_PROPERTY(QString transformationRawString MEMBER transformationRawString)
     Q_PROPERTY(bool storeOriginal MEMBER storeOriginal)
     Q_PROPERTY(bool deleteCloudCopyAfterDownload MEMBER deleteCloudCopyAfterDownload)
 private:

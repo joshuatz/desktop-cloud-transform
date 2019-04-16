@@ -3,6 +3,7 @@ import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
 import "../"
 import "../components"
+import "../animated"
 import QtQuick.Layouts 1.3
 
 import QtQuick.Dialogs 1.2
@@ -81,6 +82,9 @@ Item {
                             CheckBox {
                                 id: saveLocallyCheckbox
                                 text: qsTr("Save Locally?")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
                             }
                         }
                         // Dynamic section - Local Save options
@@ -105,7 +109,7 @@ Item {
                                 height: parent.heigth
                                 Row {
                                     id: overwriteLocalOptionRow
-                                    height: 60
+                                    height: 40
                                     width: parent.width
                                     HelpButton {
                                         id: overwriteLocalFileHelp
@@ -114,6 +118,9 @@ Item {
                                     CheckBox {
                                         id: overwriteLocalFileCheckbox
                                         text: qsTr("Overwrite Local File?")
+                                        onCheckStateChanged: {
+                                            root.comboValidator();
+                                        }
                                     }
                                     Item {
                                         width: (parent.width - overwriteLocalFileCheckbox.width) * 0.2
@@ -128,7 +135,7 @@ Item {
                                 Row {
                                     id: overwriteWarning
                                     width: parent.width
-                                    height: 30
+                                    height: 50
                                     visible: overwriteLocalFileCheckbox.checked
                                     Item {
                                         width: (parent.width - overwriteWarningRect.width) /2
@@ -161,6 +168,9 @@ Item {
                             CheckBox {
                                 id: usesPresetCheckbox
                                 text: qsTr("Uses Named Preset")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
                             }
                             TextField {
                                 id: presetNameInput
@@ -179,6 +189,9 @@ Item {
                             CheckBox {
                                 id: usesNamedTransCheckbox
                                 text: qsTr("Uses Named Transformation")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
                             }
                             TextField {
                                 id: namedTransInput
@@ -197,6 +210,9 @@ Item {
                             CheckBox {
                                 id: usesRawTransCheckbox
                                 text: qsTr("Uses a Raw Transformation String")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
                             }
                             TextField {
                                 id: rawTransInput
@@ -215,6 +231,9 @@ Item {
                             CheckBox {
                                 id: storeOriginalCheckbox
                                 text: qsTr("Store the original image file on Cloudinary servers?")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
                             }
                         }
 
@@ -231,13 +250,25 @@ Item {
             id: bottomActionBar
             width: parent.width
             anchors.bottom: parent.bottom
-            leftPadding: (parent.width / 3) / 3
-            spacing: (parent.width / 3) / 3
+            leftPadding: (parent.width / divisor) / divisor
+            spacing: (parent.width / divisor) / divisor
             anchors.horizontalCenter: parent.horizontalCenter
+            property int numButtons: deleteButton.visible ? 3 : 2
+            property int divisor: bottomActionBar.numButtons + 1
+            Button {
+                id: deleteButton
+                icon.source: "qrc:/assets/baseline-delete_forever-24px.svg"
+                Material.background: Material.color(Material.Red,Material.Shade400)
+                visible: !root.isNewConfig
+                onClicked: {
+                    confirmDelete.open();
+                }
+            }
+
             Button {
                 id: cancelButton
                 text: qsTr("Cancel")
-                width: parent.width / 3
+                width: parent.width / bottomActionBar.divisor
                 onClicked: {
                     closeAction();
                 }
@@ -246,7 +277,7 @@ Item {
             Button {
                 id: saveButton
                 text: qsTr("Save")
-                width: parent.width / 3
+                width: parent.width / bottomActionBar.divisor
                 onClicked: {
                     submitForm();
                 }
@@ -254,20 +285,78 @@ Item {
             }
         }
     }
+
     MessageDialog {
         id: formError
         title: "Error"
         text: "Something went wrong... Did you fill out all fields?"
     }
 
+    MessageDialog {
+        id: deleteError
+        title: "Error"
+        text: "Failed to delete config."
+    }
+
+    MessageDialog {
+        id: confirmDelete
+        icon: StandardIcon.Warning
+        title: qsTr("Are you sure?")
+        text: qsTr("Once a configuration is deleted, it can not be recovered without recreating from scratch")
+        standardButtons: StandardButton.No | StandardButton.Yes
+        onYes: {
+            console.log("Going to delete...");
+            root.deleteAction();
+        }
+    }
+
     property var submitForm: (function(){
-        var validated = false;
+        var validated = true;
+        var configObj;
+        if (root.isNewConfig) {
+            configObj = UploadConfigsList.getBlankTransformationConfig();
+        }
+        else {
+            configObj = root.attachedConfig;
+        }
+
+        // Map all form inputs to config values...
+
+
+
+
+
+        console.log(JSON.stringify(configObj));
+
         validated = GlobalSettings.updateInBulk(cloudinaryCloudNameInput.text,cloudinaryApiKeyInput.text,cloudinaryApiSecretInput.text);
         if (validated){
             cancelAction();
         }
         else {
             formError.open();
+        }
+    })
+
+    property var deleteAction: (function(){
+        if (root.isNewConfig==false){
+            var deleteSuccess = UploadConfigsList.deleteConfigByid(root.attachedConfig.id);
+            if (deleteSuccess){
+                globalToastManager.show("Config Deleted!")
+                root.closeAction();
+            }
+            else {
+                deleteError.open();
+            }
+        }
+    })
+
+    property var comboValidator: (function(){
+        // @TODO - call this fn every time a checkbox is toggled, and this will make sure only valid combos of settings are live
+        // @TODO? Prompt warning if invalid combo is set before unsetting it
+        if (usesPresetCheckbox.checked){
+            // If using a preset, don't allow named transformation or raw trans string
+            usesNamedTransCheckbox.checked = false;
+            usesRawTransCheckbox.checked = false;
         }
     })
 }

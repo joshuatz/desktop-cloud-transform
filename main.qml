@@ -24,6 +24,7 @@ ApplicationWindow {
         width: parent.width
         settingsPopup: globalSettingsPopup
         newButtonCallback: (function(){
+            configEditorPopup.contentItem.isNewConfig = true;
             configEditorPopup.open();
         })
         background: ThemeColors.darkPrimary
@@ -35,6 +36,11 @@ ApplicationWindow {
         height: parent.height - topBar.height - bottomBar.height
         width: parent.width
         background: ThemeColors.darkSecondary
+        editCallbackByConfig: (function(config){
+            configEditorPopup.contentItem.isNewConfig = false;
+            configEditorPopup.contentItem.attachedConfig = config;
+            configEditorPopup.open();
+        })
     }
 
     // Bottom Bar - area to drop file to upload

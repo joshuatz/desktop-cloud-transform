@@ -53,33 +53,42 @@ void TransformationList::saveAllToStorage(){
 }
 
 int TransformationList::saveNewToStorage(TransformationConfig newConfig){
+    return TransformationList::insertOrUpdateInStorage(newConfig,true);
+}
+
+void TransformationList::updateExistingInStorage(){
+    // @TODO
+}
+
+int TransformationList::insertOrUpdateInStorage(TransformationConfig config, bool isUpdate){
     int insertedRecordId = -1;
     bool res = false;
     if (Database::connected){
         QSqlQuery insertQuery;
-        insertQuery.prepare(QStringList({"INSERT INTO ",TransformationList::TABLENAME," (user_defined_name,save_locally,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_named_trans,named_trans,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(:user_defined_name,:save_locally,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,:uses_named_trans,:named_trans,:uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)"}).join(""));
-        insertQuery.bindValue(":user_defined_name",newConfig.userDefinedName);
-        insertQuery.bindValue(":save_locally",newConfig.saveLocally);
-        insertQuery.bindValue(":overwrite_local",newConfig.overwriteLocalFile);
-        insertQuery.bindValue(":created_file_suffix",newConfig.createdFileSuffix);
-        insertQuery.bindValue(":uses_preset",newConfig.usesPreset);
-        insertQuery.bindValue(":preset_name",newConfig.presetName);
-        insertQuery.bindValue(":uses_named_trans",newConfig.usesNamedTransformation);
-        insertQuery.bindValue(":named_trans",newConfig.namedTransformation);
-        insertQuery.bindValue(":uses_trans_string",newConfig.usesTransformationRawString);
-        insertQuery.bindValue(":trans_string",newConfig.transformationRawString);
-        insertQuery.bindValue(":store_original",newConfig.storeOriginal);
-        insertQuery.bindValue(":delete_cloud_after_download",newConfig.deleteCloudCopyAfterDownload);
+        // Construct SQL query dynamically
+        QString query = "REPLACE INTO " + TransformationList::TABLENAME + " (" + (isUpdate ? "id," : "") + "user_defined_name,save_locally,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_named_trans,named_trans,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(" + (isUpdate ? ":id," : "") + ":user_defined_name,:save_locally,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,:uses_named_trans,:named_trans,:uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)";
+        insertQuery.prepare(query);
+        if (isUpdate){
+            insertQuery.bindValue(":id",config.id);
+        }
+        insertQuery.bindValue(":user_defined_name",config.userDefinedName);
+        insertQuery.bindValue(":save_locally",config.saveLocally);
+        insertQuery.bindValue(":overwrite_local",config.overwriteLocalFile);
+        insertQuery.bindValue(":created_file_suffix",config.createdFileSuffix);
+        insertQuery.bindValue(":uses_preset",config.usesPreset);
+        insertQuery.bindValue(":preset_name",config.presetName);
+        insertQuery.bindValue(":uses_named_trans",config.usesNamedTransformation);
+        insertQuery.bindValue(":named_trans",config.namedTransformation);
+        insertQuery.bindValue(":uses_trans_string",config.usesTransformationRawString);
+        insertQuery.bindValue(":trans_string",config.transformationRawString);
+        insertQuery.bindValue(":store_original",config.storeOriginal);
+        insertQuery.bindValue(":delete_cloud_after_download",config.deleteCloudCopyAfterDownload);
         res = insertQuery.exec();
         if (res){
             insertedRecordId = insertQuery.lastInsertId().Int;
         }
     }
     return insertedRecordId;
-}
-
-void TransformationList::updateExistingInStorage(){
-    // @TODO
 }
 
 TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord row){
@@ -128,4 +137,12 @@ QMap<QString,QVariant> TransformationList::configToParams(TransformationConfig c
         //
     }
     return params;
+}
+
+bool TransformationList::deleteConfigByid(int configId){
+    bool success = false;
+
+    // @TODO
+
+    return success;
 }

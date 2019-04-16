@@ -35,6 +35,10 @@ private:
         connectionEstablished = dbSetup.open();
         Database::db = dbSetup;
         this->connected = connectionEstablished;
+        if (connectionEstablished){
+            // Set options - must be done after open
+            Database::db.exec("PRAGMA foreign_keys = ON;");
+        }
         return connectionEstablished;
     }
     static Database *m_instance;

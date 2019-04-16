@@ -6,6 +6,7 @@ import "../"
 Item {
     property alias background: background.color
     property var configList: UploadConfigsList.configList
+    property var editCallbackByConfig;
     width: parent.width
     height: 200
     id: root
@@ -75,6 +76,7 @@ Item {
                             anchors.topMargin: parent.height * 0.1
                             spacing: 10
                             anchors.left: fileDropAreaWrapper.right
+                            // Filepicker button
                             Button {
                                 icon.source: "qrc:/assets/baseline-folder_open-24px.svg"
                                 Material.background: ThemeColors.darkAccent
@@ -83,12 +85,12 @@ Item {
                                     imageFilePicker.open();
                                 }
                             }
-
+                            // Edit button
                             Button {
                                 icon.source: "qrc:/assets/baseline-edit-24px.svg"
                                 Material.background: ThemeColors.darkAccent
                                 onClicked: {
-                                    // @TODO
+                                    editCallbackByConfig(configDelegate.currConfig);
                                 }
                             }
                         }

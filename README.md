@@ -9,6 +9,7 @@
  - Add about screen modal - shows when clicking on upper right button
  - DB migrations (for install or upgrade)
 ## Backlog / Should implement
+ - Refactor naming of classes, objects, methods - distinction between transformations and configs
  - Tag items uploaded through this tool to make easier to find online
      - https://cloudinary.com/documentation/image_upload_api_reference#tags_method
  - Internal stats collection and display to user

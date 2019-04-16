@@ -29,8 +29,14 @@ public slots:
     void loadAllFromStorage();
     void saveAllToStorage();
     int saveNewToStorage(TransformationConfig newConfig);
+    int insertOrUpdateInStorage(TransformationConfig config,bool isUpdate);
     void updateExistingInStorage();
     TransformationList::ConfigList getDefaults();
+    TransformationConfig getBlankTransformationConfig(){
+        TransformationConfig config;
+        return config;
+    }
+    bool deleteConfigByid(int configId);
 private:
     static TransformationList *m_instance;
     static const QString TABLENAME;
