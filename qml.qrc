@@ -17,5 +17,9 @@
         <file>assets/baseline-folder_open-24px.svg</file>
         <file>assets/iconfinder_icon-33-clipboard-add_314289_black.svg</file>
         <file>qml/components/ImageFilePicker.qml</file>
+        <file>qml/forms/ConfigEditor.qml</file>
+        <file>qml/forms/CheckboxFrmRow.qml</file>
+        <file>qml/components/HelpButton.qml</file>
+        <file>assets/baseline-help_outline-24px.svg</file>
     </qresource>
 </RCC>

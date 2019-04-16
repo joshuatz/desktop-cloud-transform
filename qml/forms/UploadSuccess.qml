@@ -194,7 +194,7 @@ Item {
         if (root.hasConfig){
             var imageToDisplayPath = "";
             if (root.attachedConfig.saveLocally){
-                imageToDisplayPath = root.uploadResult.localSavePath;
+                imageToDisplayPath = Helpers.formatFilePathForQml(root.uploadResult.localSavePath);
                 stringCopyFields.append([
                     {
                         "fieldName" : "Local File Path",

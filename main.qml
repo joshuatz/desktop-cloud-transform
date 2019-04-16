@@ -23,6 +23,9 @@ ApplicationWindow {
         id: topBar
         width: parent.width
         settingsPopup: globalSettingsPopup
+        newButtonCallback: (function(){
+            configEditorPopup.open();
+        })
         background: ThemeColors.darkPrimary
     }
 
@@ -63,6 +66,24 @@ ApplicationWindow {
             })
         }
     }
+    // Config editor popup
+    Popup {
+        id: configEditorPopup
+        anchors.centerIn: parent
+        width: parent.width - 50
+        height: parent.height - 50
+        modal: true
+        dim: true
+        background: Rectangle {
+            color: ThemeColors.darkPrimary
+        }
+        contentItem: ConfigEditor {
+            closeAction: (function(){
+                configEditorPopup.close();
+            })
+        }
+    }
+
     // Progress bar modal
     Popup {
         id: mainProgressBarModal
@@ -140,7 +161,7 @@ ApplicationWindow {
                 uploadSuccessModal.close();
             })
         }
-        visible: true
+        visible: false
     }
 
     // Global toast manager

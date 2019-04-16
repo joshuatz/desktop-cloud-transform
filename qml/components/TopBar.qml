@@ -9,6 +9,7 @@ Item {
     height: 80
     property var settingsPopup
     property alias background : container.color
+    property var newButtonCallback
     Rectangle {
         id: container
         color: Material.primary
@@ -24,6 +25,9 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: (parent.height - height) / 2
             Material.background: ThemeColors.darkAccent
+            onClicked: {
+                root.newButtonCallback();
+            }
         }
         Button {
             id: settingsButton

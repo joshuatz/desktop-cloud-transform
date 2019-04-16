@@ -53,3 +53,13 @@ void Helpers::copyToClipboard(QString strToCopy){
     QClipboard *clipboard = QGuiApplication::clipboard();
     clipboard->setText(strToCopy);
 }
+
+QString Helpers::formatFilePathForQml(QString filePath){
+    // Replace "\" with "/"
+    QString formattedPath = filePath.replace("\\","/");
+    // Make sure it is prefixed with "file:///"
+    if (formattedPath.startsWith("file:")==false){
+        formattedPath = "file:///" + formattedPath;
+    }
+    return formattedPath;
+}

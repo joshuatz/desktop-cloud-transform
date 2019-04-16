@@ -36,7 +36,7 @@ UploadActionResult Uploader::mockUploadResult(QString type){
         result.attachedConfig = TransformationConfig();
         if (type=="withConfigSaveLocal"){
             result.attachedConfig.saveLocally = true;
-            result.localSavePath = "file:///C:/Users/Joshua/Downloads/Temp/TRUETEMP/tmb9BkG.jpg";
+            result.localSavePath = "C:/Users/Joshua/Downloads/Temp/TRUETEMP/tmb9BkG.jpg";
             result.url = "https://cloudinary-res.cloudinary.com/image/upload/c_scale,w_200/v1538584137/cloudinary_logo_for_black_bg.png";
         }
         else {

@@ -15,6 +15,7 @@ signals:
 public slots:
     static bool checkValidImageFilePath(QString imagePath);
     static void copyToClipboard(QString strToCopy);
+    static QString formatFilePathForQml(QString filePath);
 private:
 };
 
