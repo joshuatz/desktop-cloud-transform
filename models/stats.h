@@ -2,6 +2,7 @@
 #define STATS_H
 
 #include <QObject>
+#include "transformationconfig.h"
 
 class Stats : public QObject
 {
@@ -15,6 +16,8 @@ signals:
     void statsUpdated();
 public slots:
     void forceRefreshFromDb();
+    static int logStat(QString category, QString action, bool usedCloudinary);
+    static int logStatWithConfig(QString category,QString action,bool usedCloudinary,bool usedConfig,int configId);
 private:
     static Stats *m_instance;
     static const QString TABLENAME;

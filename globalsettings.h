@@ -2,11 +2,12 @@
 #define GLOBALSETTINGS_H
 
 #include <QObject>
+#include <QVariant>
 
 struct settingDbResult {
     bool found;
-    QString value;
-    settingDbResult(bool found,QString value) :
+    QVariant value;
+    settingDbResult(bool found,QVariant value) :
         found(found),
         value(value)
     {}
@@ -16,6 +17,7 @@ class GlobalSettings : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString cloudinaryCloudName MEMBER m_cloudinaryCloudName NOTIFY settingsChanged)
+    Q_PROPERTY(bool optedOutTracking MEMBER m_optedOutTracking NOTIFY settingsChanged)
 public:
     explicit GlobalSettings(QObject *parent = nullptr);
     static GlobalSettings *getInstance();
@@ -24,7 +26,7 @@ signals:
     void settingsChanged();
     void internetConnectionChanged();
 public slots:
-    bool updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret);
+    bool updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret, bool optedOutTracking);
     void loadFromStorage();
     void saveToStorage();
     QString getCloudinaryCloudName(){
@@ -36,14 +38,18 @@ public slots:
     QString getCloudinaryApiSecret(){
         return m_cloudinaryApiSecret;
     }
+    bool getIsOptedOutTracking(){
+        return m_optedOutTracking;
+    }
 private:
     static GlobalSettings *m_instance;
     QString m_cloudinaryCloudName;
     QString m_cloudinaryApiKey;
     QString m_cloudinaryApiSecret;
     bool m_hasInternet = false;
-    settingDbResult getSettingStringFromDb(QString settingKey);
-    bool saveSettingStringToDb(QString settingKey, QString settingVal);
+    settingDbResult getSettingFromDb(QString settingKey);
+    bool saveSettingToDb(QString settingKey, QVariant settingVal);
+    bool m_optedOutTracking = false;
 };
 
 #endif // GLOBALSETTINGS_H

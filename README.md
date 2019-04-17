@@ -5,6 +5,7 @@
      - Incoming transformations on upload - https://cloudinary.com/documentation/upload_images#incoming_transformations
 ### TODOS
 ## !! - High priority - !!
+ - Cleanup QNetworkReply instances - use deleteLater to free up (probs in slot?)
  - Timeout for auto-close of success modal needs to be auto-cancelled if clicked on
  - Add about screen modal - shows when clicking on upper right button
  - DB migrations (for install or upgrade)
