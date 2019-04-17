@@ -153,6 +153,10 @@ void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
 
 }
 
+QString Cloudinary::getAdminBaseEndpoint(){
+    return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName();
+}
+
 QString Cloudinary::getUploadEndpoint(QString resourceType){
     return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName()  + "/" + resourceType + "/upload";
 }
@@ -179,3 +183,23 @@ QString Cloudinary::generateImageUrlFromConfigAndId(QString uploadedPublicId, Tr
     return publicUrl;
 }
 
+QString Cloudinary::getBasicAuthHeaderString(){
+    // Construct base64 section
+    QString base64AuthString = (GlobalSettings::getInstance()->getCloudinaryApiKey() + ":" + GlobalSettings::getInstance()->getCloudinaryApiSecret()).toLocal8Bit().toBase64();
+    return "Basic " + base64AuthString;
+}
+
+void Cloudinary::getUsageInfoJson(void(*fnPtr)(QJsonObject res)){
+    if (fnPtr!=nullptr){
+        QString endpoint = Cloudinary::getAdminBaseEndpoint() + "/usage";
+        QNetworkAccessManager *netManager = new QNetworkAccessManager();
+        QNetworkRequest request(endpoint);
+        request.setRawHeader("Authorization",Cloudinary::getBasicAuthHeaderString().toLocal8Bit());
+        QObject::connect(netManager,&QNetworkAccessManager::finished,[fnPtr](QNetworkReply *reply){
+            QString data = reply->readAll();
+            QJsonObject jsonResult = QJsonObject(QJsonDocument::fromJson(data.toUtf8()).object());
+            fnPtr(jsonResult);
+        });
+        QNetworkReply *reply = netManager->get(request);
+    }
+}
