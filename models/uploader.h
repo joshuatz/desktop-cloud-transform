@@ -54,7 +54,7 @@ private:
     bool m_uploadInProgress = false;
     int m_processingIndex = 0;
     int m_processingQueueLength = 0;
-    UploadActionResult m_lastUploadActionResult = UploadActionResult();
+    UploadActionResult m_lastUploadActionResult;
     static Uploader *m_instance;
     bool m_hasAttachedConfig = false;
     TransformationConfig m_attachedConfig;

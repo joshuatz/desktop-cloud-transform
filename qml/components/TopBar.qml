@@ -19,7 +19,7 @@ Item {
 
         Button {
             id: addNewTrButton
-            text: qsTr("+ New")
+            text: qsTr("+ New Configuration")
             anchors.left: parent.left
             anchors.leftMargin: container.spacing
             anchors.top: parent.top

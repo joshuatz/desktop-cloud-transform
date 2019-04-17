@@ -159,8 +159,8 @@ ApplicationWindow {
             color: ThemeColors.darkPrimary
         }
         contentItem: UploadSuccess {
-//            uploadResult: uploadSuccessModal.uploadResult
-            uploadResult: Uploader.mockUploadResult("withConfigSaveLocal")
+            uploadResult: uploadSuccessModal.uploadResult
+//            uploadResult: Uploader.mockUploadResult("withConfigSaveLocal")
             globalToastManager: globalToastManager
             anchors.fill: parent
             closeFunction: (function(){
@@ -179,6 +179,7 @@ ApplicationWindow {
     }
 
     // Attaching some signals to the top level app window
+    property bool applicationHasInitialized: false
     property bool uploadInProgress: Uploader.uploadInProgress
     onUploadInProgressChanged: {
         mainProgressBarModal.visible = root.uploadInProgress
@@ -186,23 +187,32 @@ ApplicationWindow {
     }
     property var lastUploadResult: Uploader.lastUploadActionResult
     onLastUploadResultChanged: {
-        console.log(JSON.stringify(root.lastUploadResult));
-        if (root.lastUploadResult.success){
-            uploadSuccessModal.uploadResult = root.lastUploadResult;
-            uploadSuccessModal.open();
-            delay(5000,function(){
-               uploadSuccessModal.close();
-            });
+        if (root.applicationHasInitialized){
+            console.log(JSON.stringify(root.lastUploadResult));
+            if (root.lastUploadResult.success){
+                uploadSuccessModal.uploadResult = root.lastUploadResult;
+                uploadSuccessModal.contentItem.resetModal();
+                uploadSuccessModal.open();
+                delay(5000,function(){
+//                   uploadSuccessModal.close();
+                });
 
-        }
-        else {
-            // @TODO replace with animated toast
-            globalToastManager.show("Upload failed!");
+            }
+            else {
+                // @TODO replace with animated toast
+                globalToastManager.show("Upload failed!");
+            }
         }
     }
 
     Timer {
         id: timer
+    }
+
+    Component.onCompleted: {
+        delay(100,function(){
+            root.applicationHasInitialized = true;
+        })
     }
 
     function delay(delayTime, cb) {

@@ -18,3 +18,4 @@
 ## Icebox / optional:
  - When uploading images, use filename to check if already uploaded, and if so, offer option to "rename" version on cloudinary sever
      - Use https://cloudinary.com/documentation/image_upload_api_reference#rename_method
+ - Move some reusable JS logic stuff out of QML files and into reusable JS files

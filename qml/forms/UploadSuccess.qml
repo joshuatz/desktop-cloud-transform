@@ -163,34 +163,58 @@ Item {
                 }
             }
         }
-
-
-
-
-
-        ListModel {
-            id: conditionalCopyFields
-            ListElement {
-                fieldName: "Local File Path"
-                fieldVal: ""
-            }
-            ListElement {
-                fieldName: "New Filename"
-                fieldVal: ""
-            }
-            Component.onCompleted: {
-//                conditionalCopyFields.append({})
-            }
-        }
     }
 
     Component.onCompleted: {
 //        root.uploadResult = Uploader.mockUploadResult("withConfig");
-        root.uploadResult = Uploader.mockUploadResult("withConfigSaveLocal");
-        root.initModal();
+//        root.uploadResult = Uploader.mockUploadResult("withConfigSaveLocal");
+        root.resetModal();
     }
 
-    property var initModal: (function(){
+    /**
+    * Hidden Elements
+    */
+    ToastManager {
+        id: localToastManager
+        verticalLayoutDirection: ListView.TopToBottom
+        spacing: 20
+        anchors.topMargin: root.height * 0.4
+    }
+
+    // @TODO use listview and delegate to provide nice fields to copy paste out of
+    ListModel {
+        id: stringCopyFields
+    }
+
+    Component {
+        id: inlinePreviewImageComponent
+        Rectangle {
+            width: imagePreviewAreaLoader.width
+            height: imagePreviewAreaLoader.height
+            color: Qt.rgba(0,0,0,0)
+            Image {
+                height: parent.height - 10
+                width: parent.width * 0.5
+                anchors.centerIn: parent
+                fillMode: Image.PreserveAspectFit
+                source: imagePreviewAreaLoader.imagePath
+            }
+        }
+    }
+
+    property var resetModal: (function(){
+        imagePreviewAreaLoader.visible = false;
+        stringCopyFields.clear();
+        stringCopyFields.append([
+            {
+                "fieldName" : "URL",
+                "fieldVal" : uploadResult.url
+            },
+            {
+                "fieldName" : "id",
+                "fieldVal" : uploadResult.id
+            }
+        ]);
         if (root.hasConfig){
             var imageToDisplayPath = "";
             if (root.attachedConfig.saveLocally){
@@ -210,49 +234,4 @@ Item {
             imagePreviewAreaLoader.sourceComponent = inlinePreviewImageComponent;
         }
     })
-
-
-    /**
-    * Hidden Elements
-    */
-    ToastManager {
-        id: localToastManager
-        verticalLayoutDirection: ListView.TopToBottom
-        spacing: 20
-        anchors.topMargin: root.height * 0.4
-    }
-
-    // @TODO use listview and delegate to provide nice fields to copy paste out of
-    ListModel {
-        id: stringCopyFields
-        Component.onCompleted: {
-            // Create the elements
-            stringCopyFields.append([
-                {
-                    "fieldName" : "URL",
-                    "fieldVal" : uploadResult.url
-                },
-                {
-                    "fieldName" : "id",
-                    "fieldVal" : uploadResult.id
-                }
-            ]);
-        }
-    }
-
-    Component {
-        id: inlinePreviewImageComponent
-        Rectangle {
-            width: imagePreviewAreaLoader.width
-            height: imagePreviewAreaLoader.height
-            color: Qt.rgba(0,0,0,0)
-            Image {
-                height: parent.height - 10
-                width: parent.width * 0.5
-                anchors.centerIn: parent
-                fillMode: Image.PreserveAspectFit
-                source: imagePreviewAreaLoader.imagePath
-            }
-        }
-    }
 }

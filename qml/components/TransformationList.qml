@@ -52,7 +52,7 @@ Item {
                         Item {
                             id: fileDropAreaWrapper
                             anchors.left: titleWrapper.right
-                            width: parent.width * 0.4
+                            width: parent.width * 0.3
                             height: parent.height
                             FileDropArea {
                                 id: fileDropArea
@@ -70,14 +70,17 @@ Item {
 
                         // Buttons
                         Row {
-                            width: parent.width * 0.2
-                            height: parent.height * 0.8
+                            anchors.left: fileDropAreaWrapper.right
+                            anchors.leftMargin: 10
                             anchors.top: parent.top
                             anchors.topMargin: parent.height * 0.1
-                            spacing: 10
-                            anchors.left: fileDropAreaWrapper.right
+                            width: (parent.width * 0.4) - anchors.leftMargin
+                            height: parent.height * 0.8
+                            leftPadding: spacing
+                            spacing: (width - filepickerButton.width - editButton.width) / 3
                             // Filepicker button
                             Button {
+                                id: filepickerButton
                                 icon.source: "qrc:/assets/baseline-folder_open-24px.svg"
                                 Material.background: ThemeColors.darkAccent
                                 onClicked: {
@@ -87,6 +90,7 @@ Item {
                             }
                             // Edit button
                             Button {
+                                id: editButton
                                 icon.source: "qrc:/assets/baseline-edit-24px.svg"
                                 Material.background: ThemeColors.darkAccent
                                 onClicked: {

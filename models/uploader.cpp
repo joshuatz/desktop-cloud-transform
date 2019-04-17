@@ -85,6 +85,7 @@ int Uploader::uploadImageFromLocalPath(QString localImageFilePath){
     // @TODO implement queue system
     int queueNumber = 0;
     if (Helpers::checkValidImageFilePath(localImageFilePath)){
+        Uploader::getInstance()->setUploadInProgress(true);
         this->m_processingIndex = queueNumber;
         qDebug() << "Uploading image. in queue at #" << queueNumber;
         Cloudinary::uploadLocalFileByPath(localImageFilePath);
@@ -139,6 +140,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
             if (config.saveLocally){
                 QFileInfo fileInfo = QFileInfo(this->m_localFilePath);
                 QString pathToSaveFileTo = this->m_localFilePath;
+
                 if (config.overwriteLocalFile == false){
                     QString createdFileSuffix = config.createdFileSuffix!="" ? config.createdFileSuffix : "_dct";
                     pathToSaveFileTo = fileInfo.absolutePath() + "/" + fileInfo.baseName() + createdFileSuffix;
@@ -150,6 +152,11 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                 // Actually download the file to disk
                 qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
                 Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
+
+                // Update result
+                // Update result
+                result.savedLocally = true;
+                result.localSavePath = pathToSaveFileTo;
 
                 if (config.deleteCloudCopyAfterDownload){
                     // @TODO
@@ -163,19 +170,21 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
         }
     }
 
-    // Push the result
+    // Push the result - delay to allow file saving to finish out
     this->m_lastUploadActionResult = result;
     Uploader::getInstance()->m_lastUploadActionResult = result;
-    emit this->uploadActionResultReceived();
     // Finally, regardless of actual reply, close out the pending upload - this will also emit
     this->setUploadInProgress(false);
-    Uploader::getInstance()->setUploadInProgress(false);
+    QTimer::singleShot(400,[](){
+        Uploader::getInstance()->setUploadInProgress(false);
+        emit Uploader::getInstance()->uploadActionResultReceived();
+    });
 }
 
 void Uploader::setUploadInProgress(bool uploadInProgressStatus){
     if (m_uploadInProgress != uploadInProgressStatus){
         m_uploadInProgress = uploadInProgressStatus;
-        emit Uploader::uploadInProgressChanged();
+        emit Uploader::getInstance()->uploadInProgressChanged();
     }
 }
 

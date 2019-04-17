@@ -75,6 +75,28 @@ Item {
                     text: GlobalSettings.getCloudinaryApiSecret();
                 }
             }
+            Row {
+                width: parent.width
+                height: 20
+            }
+
+            Row {
+                width: parent.width
+                Text {
+                    text: qsTr("To find your credentials, log into your Cloudinary Console homepage. -> ")
+                    color: "white"
+                }
+                Text {
+                    text: qsTr("Link to Console")
+                    color: ThemeColors.darkPrimary
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            Qt.openUrlExternally("https://cloudinary.com/console");
+                        }
+                    }
+                }
+            }
         }
         Row {
             id: bottomActionBar
