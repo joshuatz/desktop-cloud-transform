@@ -12,6 +12,13 @@ Item {
     id: root
     property bool isNewConfig: true
     property var attachedConfig
+    onAttachedConfigChanged: {
+        root.mapConfigToFields();
+    }
+    onIsNewConfigChanged: {
+        root.mapConfigToFields();
+    }
+
     property var closeAction
     anchors.fill: parent
     anchors.margins: 20
@@ -257,7 +264,7 @@ Item {
                         Row {
                             id: bufferRow
                             width: parent.width
-                            height: 300
+                            height: 200
                         }
                     } // </Column>
                 }
@@ -329,6 +336,7 @@ Item {
 
     property var submitForm: (function(){
         var validated = true;
+        var submitSuccess = false;
         var configObj;
         if (root.isNewConfig) {
             configObj = UploadConfigsList.getBlankTransformationConfig();
@@ -343,7 +351,19 @@ Item {
         console.log(JSON.stringify(configObj));
 
         if (validated){
-            cancelAction();
+            submitSuccess = UploadConfigsList.insertOrUpdateInStorage(configObj,!root.isNewConfig);
+            if (submitSuccess){
+                if (root.isNewConfig){
+                    globalToastManager.show("Config Created!");
+                }
+                else {
+                    globalToastManager.show("Config Updated!");
+                }
+                root.closeAction();
+            }
+            else {
+                formError.open();
+            }
         }
         else {
             formError.open();
@@ -435,6 +455,7 @@ Item {
     property var deleteAction: (function(){
         if (root.isNewConfig==false){
             var deleteSuccess = UploadConfigsList.deleteConfigByid(root.attachedConfig.id);
+            console.log("Deleting config #" + root.attachedConfig.id);
             if (deleteSuccess){
                 globalToastManager.show("Config Deleted!")
                 root.closeAction();

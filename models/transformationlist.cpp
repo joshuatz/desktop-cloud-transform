@@ -32,6 +32,9 @@ TransformationList::ConfigList TransformationList::getDefaults(){
 
 void TransformationList::loadAllFromStorage(){
     if (Database::connected){
+        // Reset shared lists
+        this->configMapById.clear();
+        this->configVariantMapById.clear();
         QSqlQueryModel queryModel;
         queryModel.setQuery(QStringList({"SELECT * FROM ",TransformationList::TABLENAME}).join(""));
         for (int i=0; i < queryModel.rowCount(); ++i){
@@ -85,7 +88,13 @@ int TransformationList::insertOrUpdateInStorage(TransformationConfig config, boo
         insertQuery.bindValue(":delete_cloud_after_download",config.deleteCloudCopyAfterDownload);
         res = insertQuery.exec();
         if (res){
-            insertedRecordId = insertQuery.lastInsertId().Int;
+            insertedRecordId = insertQuery.lastInsertId().toInt();
+            qDebug() << "Config inserted or updated. Id = " << insertedRecordId;
+            config.id = insertedRecordId;
+            // @TODO is this most efficient way? Could also call loadAllFromStorage for more accuracy, but that uses a SQL call
+            // Update the static list instance
+            this->addOrUpdateOnSharedLists(config);
+            emit TransformationList::getInstance()->transformationsChanged();
         }
     }
     return insertedRecordId;
@@ -142,7 +151,38 @@ QMap<QString,QVariant> TransformationList::configToParams(TransformationConfig c
 bool TransformationList::deleteConfigByid(int configId){
     bool success = false;
 
-    // @TODO
+    if (Database::connected){
+        QSqlQuery deleteQuery;
+        deleteQuery.prepare(QStringList({"DELETE FROM ",TransformationList::TABLENAME," WHERE ",TransformationList::TABLENAME,".id = ",QString::number(configId)}).join(""));
+        success = deleteQuery.exec();
+        if (success){
+            this->removeFromSharedListsByConfigId(configId);
+            emit TransformationList::getInstance()->transformationsChanged();
+        }
+        else {
+            qDebug() << "Failed to delete config with id = " << configId;
+        }
+    }
 
     return success;
 }
+
+void TransformationList::addOrUpdateOnSharedLists(TransformationConfig config){
+    // REMINDER: For QMap, QMap::insert is equivalent to sql's INSERT OR REPLACE - if key already exists, just updates value instead of inserting.
+    TransformationList::getInstance()->configMapById.insert(config.id,config);
+    TransformationList::getInstance()->configVariantMapById.insert(config.id,QVariant::fromValue(config));
+}
+
+void TransformationList::removeFromSharedListsByConfig(TransformationConfig config){
+    TransformationList::removeFromSharedListsByConfigId(config.id);
+}
+
+void TransformationList::removeFromSharedListsByConfigId(int configId){
+    int configMayByIdRemovedCount = TransformationList::getInstance()->configMapById.remove(configId);
+    int configVariantMapByIdRemovedCount = TransformationList::getInstance()->configVariantMapById.remove(configId);
+    if (configMayByIdRemovedCount == 0 || configVariantMapByIdRemovedCount == 0){
+        qDebug() << "Config was not removed from shared lists";
+    }
+}
+
+

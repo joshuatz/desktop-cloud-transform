@@ -15,14 +15,22 @@ class TransformationList : public QObject
 public:
     explicit TransformationList(QObject *parent = nullptr);
     static TransformationList *getInstance();
+    // Static lists that are kept up to date and shared to QML layer
+    static QMap<int,TransformationConfig> configMapById;
+    static QMap<int,QVariant> configVariantMapById;
+    // Helpers
+    static QMap<QString,QVariant> configToParams(TransformationConfig config);
+    // Getters
+    static QVariantList getConfigListAsVariantList();
+    static TransformationConfig getConfigById(int id);
+    // Setters / updaters
+    static void addOrUpdateOnSharedLists(TransformationConfig config);
+    static void removeFromSharedListsByConfig(TransformationConfig config);
+    static void removeFromSharedListsByConfigId(int configId);
+    // Typedefs
     typedef QList<TransformationConfig> ConfigList;
     typedef QMap<int,TransformationConfig> ConfigMapByIdType;
     typedef QMap<int,QVariant> configVariantMapByIdType;
-    static QMap<int,TransformationConfig> configMapById;
-    static QMap<int,QVariant> configVariantMapById;
-    static QVariantList getConfigListAsVariantList();
-    static TransformationConfig getConfigById(int id);
-    static QMap<QString,QVariant> configToParams(TransformationConfig config);
 signals:
     void transformationsChanged();
 public slots:
