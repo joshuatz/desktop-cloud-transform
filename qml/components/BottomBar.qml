@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
 import QtQuick.Dialogs 1.2
+import "."
 import "../"
 
 Item {
@@ -22,7 +23,7 @@ Item {
             text: qsTr("Upload")
             Material.background: ThemeColors.darkAccent
             onClicked: {
-                imageFilePicker.visible = true;
+                imageFilePicker.open();
             }
         }
         FileDropArea {
@@ -39,19 +40,7 @@ Item {
     }
 
     // Hidden - file picker for image
-    FileDialog {
+    ImageFilePicker {
         id: imageFilePicker
-        title: "Select an image to upload"
-        folder: shortcuts.home
-        nameFilters: "Images (*.png *.jpg *jpeg *gif *ico *bmp)"
-        // @TODO?
-        selectMultiple: false
-        onAccepted: {
-            var imagePath = imageFilePicker.fileUrl + "";
-            imagePath = imagePath.replace(/file:[\/]*/,'');
-            // Pass image path to uploader to start process off
-            Uploader.uploadImageFromLocalPath(imagePath);
-        }
-        visible: false
     }
 }

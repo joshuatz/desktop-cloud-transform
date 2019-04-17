@@ -3,27 +3,55 @@
 
 #include <QObject>
 #include <QMap>
+#include <QSqlRecord>
+#include <QVariantList>
 #include "transformationconfig.h"
 
 class TransformationList : public QObject
 {
     Q_OBJECT
-//    Q_PROPERTY(TransformationList::transformationConfigList list MEMBER list NOTIFY transformationsChanged)
+//    Q_PROPERTY(TransformationList::ConfigListById transformationConfigListById MEMBER transformationConfigListById NOTIFY transformationsChanged)
+    Q_PROPERTY(QVariantList configList READ getConfigListAsVariantList NOTIFY transformationsChanged)
 public:
     explicit TransformationList(QObject *parent = nullptr);
-    typedef QList<TransformationConfig> transformationConfigList;
-    QMap<long long,TransformationConfig> transformationConfigListById;
-    TransformationList::transformationConfigList list;
+    static TransformationList *getInstance();
+    // Static lists that are kept up to date and shared to QML layer
+    static QMap<int,TransformationConfig> configMapById;
+    static QMap<int,QVariant> configVariantMapById;
+    // Helpers
+    static QMap<QString,QVariant> configToParams(TransformationConfig config);
+    // Getters
+    static QVariantList getConfigListAsVariantList();
+    static TransformationConfig getConfigById(int id);
+    // Setters / updaters
+    static void addOrUpdateOnSharedLists(TransformationConfig config);
+    static void removeFromSharedListsByConfig(TransformationConfig config);
+    static void removeFromSharedListsByConfigId(int configId);
+    // Typedefs
+    typedef QList<TransformationConfig> ConfigList;
+    typedef QMap<int,TransformationConfig> ConfigMapByIdType;
+    typedef QMap<int,QVariant> configVariantMapByIdType;
 signals:
     void transformationsChanged();
 public slots:
     void loadAllFromStorage();
     void saveAllToStorage();
-    long long saveNewToStorage(TransformationConfig newConfig);
+    int saveNewToStorage(TransformationConfig newConfig);
+    int insertOrUpdateInStorage(TransformationConfig config,bool isUpdate);
     void updateExistingInStorage();
-    TransformationList::transformationConfigList getDefaults();
+    TransformationList::ConfigList getDefaults();
+    TransformationConfig getBlankTransformationConfig(){
+        TransformationConfig config;
+        return config;
+    }
+    bool deleteConfigByid(int configId);
 private:
+    static TransformationList *m_instance;
     static const QString TABLENAME;
+    static TransformationConfig sqlRowToTransformationConfig(QSqlRecord row);
 };
+
+Q_DECLARE_METATYPE(TransformationList::ConfigMapByIdType);
+Q_DECLARE_METATYPE(TransformationList::configVariantMapByIdType);
 
 #endif // TRANSFORMATIONLIST_H

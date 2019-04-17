@@ -23,6 +23,10 @@ ApplicationWindow {
         id: topBar
         width: parent.width
         settingsPopup: globalSettingsPopup
+        newButtonCallback: (function(){
+            configEditorPopup.contentItem.isNewConfig = true;
+            configEditorPopup.open();
+        })
         background: ThemeColors.darkPrimary
     }
 
@@ -32,6 +36,11 @@ ApplicationWindow {
         height: parent.height - topBar.height - bottomBar.height
         width: parent.width
         background: ThemeColors.darkSecondary
+        editCallbackByConfig: (function(config){
+            configEditorPopup.contentItem.isNewConfig = false;
+            configEditorPopup.contentItem.attachedConfig = config;
+            configEditorPopup.open();
+        })
     }
 
     // Bottom Bar - area to drop file to upload
@@ -63,6 +72,24 @@ ApplicationWindow {
             })
         }
     }
+    // Config editor popup
+    Popup {
+        id: configEditorPopup
+        anchors.centerIn: parent
+        width: parent.width - 50
+        height: parent.height - 50
+        modal: true
+        dim: true
+        background: Rectangle {
+            color: ThemeColors.darkPrimary
+        }
+        contentItem: ConfigEditor {
+            closeAction: (function(){
+                configEditorPopup.close();
+            })
+        }
+    }
+
     // Progress bar modal
     Popup {
         id: mainProgressBarModal
@@ -133,12 +160,14 @@ ApplicationWindow {
         }
         contentItem: UploadSuccess {
             uploadResult: uploadSuccessModal.uploadResult
+//            uploadResult: Uploader.mockUploadResult("withConfigSaveLocal")
+            globalToastManager: globalToastManager
             anchors.fill: parent
             closeFunction: (function(){
                 uploadSuccessModal.close();
             })
         }
-        visible: true
+        visible: false
     }
 
     // Global toast manager
@@ -150,6 +179,7 @@ ApplicationWindow {
     }
 
     // Attaching some signals to the top level app window
+    property bool applicationHasInitialized: false
     property bool uploadInProgress: Uploader.uploadInProgress
     onUploadInProgressChanged: {
         mainProgressBarModal.visible = root.uploadInProgress
@@ -157,23 +187,32 @@ ApplicationWindow {
     }
     property var lastUploadResult: Uploader.lastUploadActionResult
     onLastUploadResultChanged: {
-        console.log(JSON.stringify(root.lastUploadResult));
-        if (root.lastUploadResult.success){
-            uploadSuccessModal.uploadResult = root.lastUploadResult;
-            uploadSuccessModal.open();
-            delay(5000,function(){
-               uploadSuccessModal.close();
-            });
+        if (root.applicationHasInitialized){
+            console.log(JSON.stringify(root.lastUploadResult));
+            if (root.lastUploadResult.success){
+                uploadSuccessModal.uploadResult = root.lastUploadResult;
+                uploadSuccessModal.contentItem.resetModal();
+                uploadSuccessModal.open();
+                delay(5000,function(){
+//                   uploadSuccessModal.close();
+                });
 
-        }
-        else {
-            // @TODO replace with animated toast
-            globalToastManager.show("Upload failed!");
+            }
+            else {
+                // @TODO replace with animated toast
+                globalToastManager.show("Upload failed!");
+            }
         }
     }
 
     Timer {
         id: timer
+    }
+
+    Component.onCompleted: {
+        delay(100,function(){
+            root.applicationHasInitialized = true;
+        })
     }
 
     function delay(delayTime, cb) {

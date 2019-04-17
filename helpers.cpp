@@ -31,6 +31,8 @@ void Helpers::checkInternetConnection(bool *res){
 }
 
 bool Helpers::checkValidImageFilePath(QString imagePath){
+    // @TODO combine with additonal check of MIME type and generic can-access-file check.
+    // Currently failing if image extension != detected mime type
     QImageReader reader(imagePath);
     if (reader.canRead()){
         return true;
@@ -50,4 +52,14 @@ QUrlQuery Helpers::generateUrlQueryFromVarMap(QMap<QString, QVariant> params){
 void Helpers::copyToClipboard(QString strToCopy){
     QClipboard *clipboard = QGuiApplication::clipboard();
     clipboard->setText(strToCopy);
+}
+
+QString Helpers::formatFilePathForQml(QString filePath){
+    // Replace "\" with "/"
+    QString formattedPath = filePath.replace("\\","/");
+    // Make sure it is prefixed with "file:///"
+    if (formattedPath.startsWith("file:")==false){
+        formattedPath = "file:///" + formattedPath;
+    }
+    return formattedPath;
 }

@@ -2,10 +2,16 @@ import QtQuick 2.0
 import QtQuick.Controls 2.4
 import QtQuick.Controls.Material 2.3
 import "../"
+import "../animated"
 
 Item {
     property var closeFunction
     property var uploadResult
+    property var globalToastManager
+    property bool hasConfig: root.uploadResult.hasAttachedConfig
+    property var attachedConfig: root.uploadResult.attachedConfig
+    property string title: root.hasConfig ? "Tranformation Complete!" : "Upload Complete!";
+    property string subTitle: ((root.hasConfig && root.attachedConfig.saveLocally) ? "File saved and " : "") + "URL copied to clipboard. Details below:"
     id: root
     Rectangle {
         anchors.fill: parent
@@ -26,7 +32,7 @@ Item {
                 color: Qt.rgba(255/255,255/255,255/255,0.8)
                 Text {
                     anchors.centerIn: parent
-                    text: qsTr("Upload success!")
+                    text: qsTr(root.title)
                     color: ThemeColors.darkPrimary
                     font.pixelSize: 30
                 }
@@ -57,87 +63,175 @@ Item {
             anchors.topMargin: 20
             Text {
                 anchors.centerIn: parent
-                text: qsTr("URL has been copied to clipboard. Details below:")
+                text: qsTr(root.subTitle)
                 color: ThemeColors.darkPrimary
                 font.pixelSize: 20
             }
         }
+        Loader {
+            id: imagePreviewAreaLoader
+            property string imagePath: ""
+            anchors.top: mainMessage.bottom
+            anchors.topMargin: 14
+            width: parent.width
+            height: imagePreviewAreaLoader.visible ? 100 : 0
+            visible: false
+        }
+
         Item {
             id: copyableFieldsContainer
             width: parent.width * 0.9
-            height: root.height - topBar.height - mainMessage.height
+            height: root.height - topBar.height - mainMessage.height - imagePreviewAreaLoader.height
             x: parent.width * 0.05
-            anchors.top: mainMessage.bottom
+            anchors.top: imagePreviewAreaLoader.bottom
             anchors.topMargin: 10
             ListView {
+                id: copyableFieldsListview
                 anchors.fill: parent
                 anchors.topMargin: 10
                 model: stringCopyFields
-                delegate: Item {
-                    width: parent.width
-                    height: 50
-                    Row {
-                        width: parent.width
-                        height: parent.height
-                        Text {
-                            id: fieldValName
-                            text: fieldName
-                            width: parent.width * 0.4
-                        }
-                        TextInput {
-                            id: fieldValField
-                            text: fieldVal
-                            readOnly: true
-                            width: parent.width * 0.4
-                        }
-                        Component.onCompleted: {
-                            console.log(parent.height)
-                            console.log(parent.width)
+                spacing: 20
+                delegate: Component {
+                    Item {
+                        id: copyableFieldsDelegate
+                        width: copyableFieldsListview.width
+                        height: 50
+                        Row {
+                            width: parent.width
+                            height: parent.height
+                            Rectangle {
+                                width: parent.width * 0.2
+                                height: parent.height
+                                radius: 6
+                                Text {
+                                    id: fieldValName
+                                    text: fieldName
+                                    anchors.centerIn: parent
+                                }
+                            }
+                            Item {
+                                width: parent.width * 0.05
+                                height: parent.height
+                            }
+                            Rectangle {
+                                width: parent.width * 0.6
+                                height: parent.height
+                                radius: 6
+                                TextInput {
+                                    id: fieldValField
+                                    text: fieldVal
+                                    readOnly: false
+                                    anchors.fill: parent
+                                    anchors.margins: 6
+                                    wrapMode: Text.WordWrap
+                                    selectByMouse: true
+                                    layer.enabled: true
+                                    onTextChanged: {
+                                        // Reset to true value
+                                        fieldValField.text = fieldVal;
+                                    }
+                                }
+                            }
+                            Item {
+                                width: parent.width * 0.05
+                                height: parent.height
+                            }
+                            Item {
+                                width: 60
+                                height: parent.height
+                                Button {
+                                    anchors.top: parent.top
+                                    anchors.topMargin: -6
+                                    width: parent.width + 0
+                                    height: parent.height + 12
+                                    Material.background: ThemeColors.darkAccent
+                                    icon.source: "qrc:/assets/iconfinder_icon-33-clipboard-add_314289_black.svg"
+                                    onClicked: {
+                                        // Copy the attached field to clipboard
+                                        Helpers.copyToClipboard(fieldVal);
+                                        localToastManager.show("Copied to clipboard!");
+                                    }
+                                }
+                            }
+
+                            Component.onCompleted: {
+                                console.log(parent.height)
+                                console.log(parent.width)
+                            }
                         }
                     }
                 }
             }
         }
+    }
 
+    Component.onCompleted: {
+//        root.uploadResult = Uploader.mockUploadResult("withConfig");
+//        root.uploadResult = Uploader.mockUploadResult("withConfigSaveLocal");
+        root.resetModal();
+    }
 
+    /**
+    * Hidden Elements
+    */
+    ToastManager {
+        id: localToastManager
+        verticalLayoutDirection: ListView.TopToBottom
+        spacing: 20
+        anchors.topMargin: root.height * 0.4
+    }
 
+    // @TODO use listview and delegate to provide nice fields to copy paste out of
+    ListModel {
+        id: stringCopyFields
+    }
 
-        // @TODO use listview and delegate to provide nice fields to copy paste out of
-        ListModel {
-            id: stringCopyFields
-            Component.onCompleted: {
-                // Create the elements
-                stringCopyFields.append([
-                    {
-                        "fieldName" : "URL",
-                        "fieldVal" : uploadResult.url
-                    },
-                    {
-                        "fieldName" : "id",
-                        "fieldVal" : uploadResult.id
-                    }
-                ])
+    Component {
+        id: inlinePreviewImageComponent
+        Rectangle {
+            width: imagePreviewAreaLoader.width
+            height: imagePreviewAreaLoader.height
+            color: Qt.rgba(0,0,0,0)
+            Image {
+                height: parent.height - 10
+                width: parent.width * 0.5
+                anchors.centerIn: parent
+                fillMode: Image.PreserveAspectFit
+                source: imagePreviewAreaLoader.imagePath
             }
-        }
-        ListModel {
-            id: conditionalCopyFields
-            ListElement {
-                fieldName: "Local File Path"
-                fieldVal: ""
-            }
-            ListElement {
-                fieldName: "New Filename"
-                fieldVal: ""
-            }
-            Component.onCompleted: {
-//                conditionalCopyFields.append({})
-            }
-        }
-
-        Text {
-            anchors.top: mainMessage.bottom
-            anchors.topMargin: 50
-            text: root.uploadResult.url
         }
     }
+
+    property var resetModal: (function(){
+        imagePreviewAreaLoader.visible = false;
+        stringCopyFields.clear();
+        stringCopyFields.append([
+            {
+                "fieldName" : "URL",
+                "fieldVal" : uploadResult.url
+            },
+            {
+                "fieldName" : "id",
+                "fieldVal" : uploadResult.id
+            }
+        ]);
+        if (root.hasConfig){
+            var imageToDisplayPath = "";
+            if (root.attachedConfig.saveLocally){
+                imageToDisplayPath = Helpers.formatFilePathForQml(root.uploadResult.localSavePath);
+                stringCopyFields.append([
+                    {
+                        "fieldName" : "Local File Path",
+                        "fieldVal" : root.uploadResult.localSavePath
+                    }
+                ]);
+            }
+            else {
+                imageToDisplayPath = root.uploadResult.url;
+            }
+            imagePreviewAreaLoader.visible = true;
+            imagePreviewAreaLoader.imagePath = imageToDisplayPath;
+            imagePreviewAreaLoader.sourceComponent = inlinePreviewImageComponent;
+        }
+    })
 }

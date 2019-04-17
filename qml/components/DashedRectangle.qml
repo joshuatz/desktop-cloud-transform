@@ -2,8 +2,14 @@ import QtQuick 2.4
 import QtQuick.Shapes 1.12
 
 Item {
+    id: root
     property alias customInset: shapeRoot.customInset
     property alias background: rect.color
+    property alias outerBorderColor: root.outerBorderColor
+    property alias dashedBorderColor: root.dashedBorderColor
+    property alias rect: rect
+    property color outerBorderColor: "black"
+    property color dashedBorderColor: "black"
     width: 400
     height: 400
     Rectangle {
@@ -11,7 +17,7 @@ Item {
         anchors.fill: parent
         color: "transparent"
         radius: 5
-        border.color: "black"
+        border.color: root.outerBorderColor
         Shape {
             id: shapeRoot
             property int customInset: 0
@@ -23,7 +29,7 @@ Item {
             ShapePath {
                 id: borderShape
                 property int offset: borderShape.strokeWidth
-                strokeColor: "black"
+                strokeColor: root.dashedBorderColor
                 strokeWidth: 2
                 strokeStyle: ShapePath.DashLine
                 fillColor: "transparent"

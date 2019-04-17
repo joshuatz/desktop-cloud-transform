@@ -53,6 +53,10 @@ void Cloudinary::uploadLocalFileByPath(QString localImagePath){
 }
 
 void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
+    Cloudinary::uploadFileByParamsWUploaderInstance(params,Uploader::getInstance());
+}
+
+void Cloudinary::uploadFileByParamsWUploaderInstance(QMap<QString, QVariant> params, Uploader *uploaderInstance){
     QMimeDatabase mimeDb;
     bool mock = false;
 
@@ -115,10 +119,16 @@ void Cloudinary::uploadFileByParams(QMap<QString, QVariant> params){
     else {
         request = QNetworkRequest(Cloudinary::getUploadEndpoint("image"));
     }
-    QNetworkReply *reply = netManager->post(request, multiPart);
+
 
     // Set up connect to listen for result
-    QObject::connect(netManager,&QNetworkAccessManager::finished,Uploader::getInstance(),&Uploader::receiveNetworkReply);
+//    QObject::connect(netManager,&QNetworkAccessManager::finished,Uploader::getInstance(),&Uploader::receiveNetworkReply);
+    QObject::connect(netManager,&QNetworkAccessManager::finished,uploaderInstance,&Uploader::receiveNetworkReply);
+//    QObject::connect(netManager,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
+//        uploaderInstance->receiveNetworkReply()
+//    });
+
+    QNetworkReply *reply = netManager->post(request, multiPart);
 
     qDebug() << reply;
     //multiPart->setParent(reply); // delete the multiPart with the reply
@@ -146,3 +156,26 @@ void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
 QString Cloudinary::getUploadEndpoint(QString resourceType){
     return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName()  + "/" + resourceType + "/upload";
 }
+
+QString Cloudinary::generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config){
+    // Construct the base URL
+    QString publicUrl = "https://res.cloudinary.com/" + GlobalSettings::getInstance()->getCloudinaryCloudName() + "/image/upload/";
+    if (config.usesPreset){
+        // This can only be used with uploads, not with public URLs
+    }
+    else if (config.usesNamedTransformation){
+        publicUrl += "t_" + config.namedTransformation + "/";
+    }
+    else if (config.usesTransformationRawString){
+        publicUrl += config.transformationRawString;
+    }
+    // make sure that URL ends in a slash before appending the base image
+    if (publicUrl.endsWith("/")==false){
+        publicUrl += "/";
+    }
+    // Finally, append the public ID or filename of the "base image" (previously uploaded image upon which to apply transformations)
+    publicUrl += uploadedPublicId;
+
+    return publicUrl;
+}
+
