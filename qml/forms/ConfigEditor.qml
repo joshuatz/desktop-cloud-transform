@@ -46,11 +46,12 @@ Item {
                         anchors.leftMargin: 10
                         clip: false
                         // There seems to be a bug in column and its own computed height - changing visibility of a row is not changing the computation automatically
-                        property real computedHeight: frmRow1.height + frmRow2.height + localSaveOptionsSection.height + frmRow3.height + frmRow4.height + frmRow5.height + frmRow6.height + heightBuffer
+                        property real computedHeight: frmRow1.height + frmRow2.height + localSaveOptionsSection.height + frmRow3.height + frmRow4.height + frmRow5.height + frmRow6.height + frmRow7.height + heightBuffer
                         property real heightBuffer: 300
 //                        height: frmColumn.computedHeight
                         onHeightChanged: {
                             console.log("frmColumn height = " + frmColumn.height);
+                            console.log("frmColumn COMPUTED height = " + frmColumn.computedHeight);
                         }
                         move: Transition {
                             NumberAnimation { properties: "x,y"; duration: 200 }
@@ -69,7 +70,6 @@ Item {
                                 id: configNameInput
                                 width: parent.width * 0.6
                                 placeholderText: "My Transformation Config"
-                                text: root.isNewConfig ? "" : root.attachedConfig.userDefinedName
                             }
                         }
                         Row {
@@ -126,7 +126,7 @@ Item {
                                         width: (parent.width - overwriteLocalFileCheckbox.width) * 0.2
                                     }
                                     TextField {
-                                        id: createdFilePrefixInput
+                                        id: createdFileSuffixInput
                                         width: (parent.width - overwriteLocalFileCheckbox.width) * 0.8
                                         placeholderText: qsTr("Suffix for created file")
                                         visible: overwriteLocalFileCheckbox.checked == false
@@ -236,11 +236,28 @@ Item {
                                 }
                             }
                         }
+                        Row {
+                            id: frmRow7
+                            width: parent.width
+                            visible: saveLocallyCheckbox.checked
+                            HelpButton {
+                                id: deleteCloudCopyAfterDownHelp
+                                helpText: qsTr("To help stay under quota limits, you can force this program to delete the generated asset off Cloudinary once it has been downloaded. Note that this prevents the URL from working")
+                            }
+                            CheckBox {
+                                id: deleteCloudCopyAfterDownCheckbox
+                                text: qsTr("Delete the copy off Cloudinary's servers after downloaded to disc?")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
+                            }
+                        }
 
                         // I shouldn't need this... something funky going on with column computed height
                         Row {
+                            id: bufferRow
                             width: parent.width
-                            height: 100
+                            height: 300
                         }
                     } // </Column>
                 }
@@ -321,20 +338,98 @@ Item {
         }
 
         // Map all form inputs to config values...
-
-
-
-
+        configObj = root.mapFieldsToConfig(configObj);
 
         console.log(JSON.stringify(configObj));
 
-        validated = GlobalSettings.updateInBulk(cloudinaryCloudNameInput.text,cloudinaryApiKeyInput.text,cloudinaryApiSecretInput.text);
         if (validated){
             cancelAction();
         }
         else {
             formError.open();
         }
+    })
+
+    property var configMapping: {
+        "userDefinedName" : {
+            "field" : configNameInput,
+            "type" : "TextField"
+        },
+        "saveLocally" : {
+            "field" : saveLocallyCheckbox,
+            "type" : "CheckBox"
+        },
+        "overwriteLocalFile" : {
+            "field" : overwriteLocalFileCheckbox,
+            "type" : "CheckBox"
+        },
+        "createdFileSuffix" : {
+            "field" : createdFileSuffixInput,
+            "type" : "TextField"
+        },
+        "usesPreset" : {
+            "field" : usesPresetCheckbox,
+            "type" : "CheckBox"
+        },
+        "presetName" : {
+            "field" : presetNameInput,
+            "type" : "TextField"
+        },
+        "usesNamedTransformation" : {
+            "field" : usesNamedTransCheckbox,
+            "type" : "CheckBox"
+        },
+        "namedTransformation" : {
+            "field" : namedTransInput,
+            "type" : "TextField"
+        },
+        "usesTransformationRawString" : {
+            "field" : usesRawTransCheckbox,
+            "type" : "CheckBox"
+        },
+        "transformationRawString" : {
+            "field" : rawTransInput,
+            "type" : "TextField"
+        },
+        "storeOriginal" : {
+            "field" : storeOriginalCheckbox,
+            "type" : "CheckBox"
+        },
+        "deleteCloudCopyAfterDownload" : {
+            "field" : deleteCloudCopyAfterDownCheckbox,
+            "type" : "CheckBox"
+        }
+    }
+
+    property var mapConfigToFields: (function(){
+        if (root.isNewConfig == false){
+        var mapping = root.configMapping;
+            for (var x=0; x<Object.keys(mapping).length; x++){
+                var qPropName = Object.keys(mapping)[x];
+                var fieldSet = mapping[qPropName];
+                if (fieldSet.type === "CheckBox"){
+                    fieldSet.field.checked = root.attachedConfig[qPropName];
+                }
+                else if (fieldSet.type === "TextField"){
+                    fieldSet.field.text = root.attachedConfig[qPropName].toString();
+                }
+            }
+        }
+    })
+
+    property var mapFieldsToConfig: (function(config){
+        var mapping = root.configMapping;
+        for (var x=0; x<Object.keys(mapping).length; x++){
+            var qPropName = Object.keys(mapping)[x];
+            var fieldSet = mapping[qPropName];
+            if (fieldSet.type === "CheckBox"){
+                config[qPropName] = fieldSet.field.checked;
+            }
+            else if (fieldSet.type === "TextField"){
+                config[qPropName] = fieldSet.field.text;
+            }
+        }
+        return config;
     })
 
     property var deleteAction: (function(){
@@ -359,4 +454,8 @@ Item {
             usesRawTransCheckbox.checked = false;
         }
     })
+
+    Component.onCompleted: {
+        root.mapConfigToFields();
+    }
 }
