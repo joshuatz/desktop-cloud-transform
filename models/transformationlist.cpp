@@ -30,6 +30,12 @@ TransformationList::ConfigList TransformationList::getDefaults(){
     return defaults;
 }
 
+/**
+ * @brief TransformationList::loadAllFromStorage - Loads all configs that are stored in the DB
+ *
+ * This updates BOTH the configMapById and configVariantMapById, which are static QMaps
+ * It also emits a signal that those lists have been updated, even if this was called and the DB was already up to date with the static QMaps
+ */
 void TransformationList::loadAllFromStorage(){
     if (Database::connected){
         // Reset shared lists
@@ -42,7 +48,6 @@ void TransformationList::loadAllFromStorage(){
             this->configMapById.insert(currConfig.id,currConfig);
             this->configVariantMapById.insert(currConfig.id,QVariant::fromValue(currConfig));
         }
-        qDebug() << "Configs loaded from storage. Count = " << this->configMapById.count();
         // @TODO better checking to see if records have actually changed vs stayed the same
         emit this->transformationsChanged();
     }
@@ -51,18 +56,21 @@ void TransformationList::loadAllFromStorage(){
     }
 }
 
-void TransformationList::saveAllToStorage(){
-    // @TODO
-}
-
+/**
+ * @brief Save a brand new config to the SQL db. Internally calls the insertOrUpdate fn
+ * @param newConfig
+ * @return id of the inserted row, which should become this configs ID
+ */
 int TransformationList::saveNewToStorage(TransformationConfig newConfig){
     return TransformationList::insertOrUpdateInStorage(newConfig,true);
 }
 
-void TransformationList::updateExistingInStorage(){
-    // @TODO
-}
-
+/**
+ * @brief This can be used to either insert a brand new config into the SQL db, or modify an existing one.
+ * @param config - Config to insert or update
+ * @param isUpdate - Whether or not this should update an existing record in the DB
+ * @return ID of the affected SQL row (which should also be the config.id)
+ */
 int TransformationList::insertOrUpdateInStorage(TransformationConfig config, bool isUpdate){
     int insertedRecordId = -1;
     bool res = false;
@@ -100,6 +108,11 @@ int TransformationList::insertOrUpdateInStorage(TransformationConfig config, boo
     return insertedRecordId;
 }
 
+/**
+ * @brief Turns a SQL row into a transformation config object
+ * @param row - a single SQL row to be parsed
+ * @return TransformationConfig result
+ */
 TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord row){
     TransformationConfig result;
     result.id = row.value("id").toInt();
@@ -118,10 +131,17 @@ TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord
     return result;
 }
 
+/**
+ * @brief Simply turns the variant QMap into a QVariantList and returns it.
+ *
+ * Convenient for the QML side, since QVariantList is usually easier to work with natively rather than QMaps
+ * @return QVariantList - the converted list
+ */
 QVariantList TransformationList::getConfigListAsVariantList(){
     return TransformationList::configVariantMapById.values();
 }
 
+// @TODO - just fetch off static lits instead of querying db? Or call force db sync first, then fetch off statics?
 TransformationConfig TransformationList::getConfigById(int id){
     TransformationConfig config;
     if (Database::connected){
@@ -133,19 +153,6 @@ TransformationConfig TransformationList::getConfigById(int id){
         }
     }
     return config;
-}
-
-QMap<QString,QVariant> TransformationList::configToParams(TransformationConfig config){
-    // @TODO
-    QMap<QString,QVariant> params;
-    if (config.usesPreset){
-        // If using a named preset, ignore manual trans string
-        params.insert("upload_preset",QVariant(config.presetName));
-    }
-    else if (config.usesTransformationRawString) {
-        //
-    }
-    return params;
 }
 
 bool TransformationList::deleteConfigByid(int configId){
@@ -167,6 +174,10 @@ bool TransformationList::deleteConfigByid(int configId){
     return success;
 }
 
+/**
+ * @brief Adds to or updates a config on the static shared lists.
+ * @param config - config to add or update
+ */
 void TransformationList::addOrUpdateOnSharedLists(TransformationConfig config){
     // REMINDER: For QMap, QMap::insert is equivalent to sql's INSERT OR REPLACE - if key already exists, just updates value instead of inserting.
     TransformationList::getInstance()->configMapById.insert(config.id,config);
@@ -177,6 +188,12 @@ void TransformationList::removeFromSharedListsByConfig(TransformationConfig conf
     TransformationList::removeFromSharedListsByConfigId(config.id);
 }
 
+/**
+ * @brief This removes a specific config from the static shared QMap config lists
+ *
+ * NOTE - this does NOT delete the config from the DB. This function should really only be called by the function that actually deletes the DB record first.
+ * @param configId - the id (config.id) of the config to remove
+ */
 void TransformationList::removeFromSharedListsByConfigId(int configId){
     int configMayByIdRemovedCount = TransformationList::getInstance()->configMapById.remove(configId);
     int configVariantMapByIdRemovedCount = TransformationList::getInstance()->configVariantMapById.remove(configId);

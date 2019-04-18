@@ -150,7 +150,6 @@ void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
     QNetworkRequest request(Cloudinary::getUploadEndpoint("image"));
     request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
     netManager->post(request,postData.toString(QUrl::FullyEncoded).toUtf8());
-
 }
 
 QString Cloudinary::getAdminBaseEndpoint(){

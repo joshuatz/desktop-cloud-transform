@@ -20,6 +20,9 @@ signals:
 public slots:
     void forceRefreshFromDb();
     static void fireGaEvent(QString category, QString action, QString label, QVariant value);
+    /**
+     * @brief logStat - logStat and logStatWithConfig both log internally - by saving to DB.
+     */
     static int logStat(QString category, QString action, bool usedCloudinary);
     static int logStatWithConfig(QString category,QString action,bool usedCloudinary,bool usedConfig,int configId);
 private:

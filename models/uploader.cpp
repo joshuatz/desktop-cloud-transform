@@ -46,7 +46,6 @@ UploadActionResult Uploader::mockUploadResult(QString type){
         }
     }
     return result;
-
 }
 
 void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationConfig config){

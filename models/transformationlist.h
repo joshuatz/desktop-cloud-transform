@@ -10,7 +10,6 @@
 class TransformationList : public QObject
 {
     Q_OBJECT
-//    Q_PROPERTY(TransformationList::ConfigListById transformationConfigListById MEMBER transformationConfigListById NOTIFY transformationsChanged)
     Q_PROPERTY(QVariantList configList READ getConfigListAsVariantList NOTIFY transformationsChanged)
 public:
     explicit TransformationList(QObject *parent = nullptr);
@@ -18,8 +17,6 @@ public:
     // Static lists that are kept up to date and shared to QML layer
     static QMap<int,TransformationConfig> configMapById;
     static QMap<int,QVariant> configVariantMapById;
-    // Helpers
-    static QMap<QString,QVariant> configToParams(TransformationConfig config);
     // Getters
     static QVariantList getConfigListAsVariantList();
     static TransformationConfig getConfigById(int id);
@@ -35,10 +32,8 @@ signals:
     void transformationsChanged();
 public slots:
     void loadAllFromStorage();
-    void saveAllToStorage();
     int saveNewToStorage(TransformationConfig newConfig);
     int insertOrUpdateInStorage(TransformationConfig config,bool isUpdate);
-    void updateExistingInStorage();
     TransformationList::ConfigList getDefaults();
     TransformationConfig getBlankTransformationConfig(){
         TransformationConfig config;
