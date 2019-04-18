@@ -27,6 +27,9 @@ ApplicationWindow {
             configEditorPopup.contentItem.isNewConfig = true;
             configEditorPopup.open();
         })
+        helpButtonCallback: (function(){
+            aboutPagePopup.open();
+        })
         background: ThemeColors.darkPrimary
     }
 
@@ -55,6 +58,7 @@ ApplicationWindow {
     /**
     * Hidden elements
     */
+
     // Global settings popup
     Popup {
         id: globalSettingsPopup
@@ -72,6 +76,25 @@ ApplicationWindow {
             })
         }
     }
+
+    // About Page Popup
+    Popup {
+        id: aboutPagePopup
+        anchors.centerIn: parent
+        width: parent.width - 50
+        height: parent.height - 50
+        modal: true
+        dim: true
+        background: Rectangle {
+            color: ThemeColors.darkPrimary
+        }
+        contentItem: AboutPage {
+            closeAction: (function(){
+                aboutPagePopup.close();
+            })
+        }
+    }
+
     // Config editor popup
     Popup {
         id: configEditorPopup

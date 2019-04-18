@@ -22,5 +22,8 @@
         <file>qml/components/HelpButton.qml</file>
         <file>assets/baseline-help_outline-24px.svg</file>
         <file>assets/baseline-delete_forever-24px.svg</file>
+        <file>qml/components/AboutPage.qml</file>
+        <file>assets/baseline-link-24px.svg</file>
+        <file>assets/AttributionsAndLicenses.txt</file>
     </qresource>
 </RCC>

@@ -18,7 +18,7 @@ Item {
         Button {
             anchors.left: parent.left
             anchors.leftMargin: parent.width * 0.1
-            width: 60
+            width: 100
             id: uploadFileSelectButton
             text: qsTr("Upload")
             Material.background: ThemeColors.darkAccent
