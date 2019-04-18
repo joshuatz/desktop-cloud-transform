@@ -1,4 +1,5 @@
 #include "database.h"
+#include "globalsettings.h"
 #include "stats.h"
 #include <QDateTime>
 #include <QSqlError>
@@ -7,6 +8,7 @@
 
 const QString Stats::TABLENAME = "stats";
 Stats *Stats::m_instance = nullptr;
+GAnalytics *Stats::m_gaTrackerInstance = nullptr;
 
 Stats *Stats::getInstance(){
     if(m_instance==nullptr){
@@ -15,11 +17,19 @@ Stats *Stats::getInstance(){
     return m_instance;
 }
 
+GAnalytics *Stats::getGaTracker(){
+    #ifdef GAUID
+        if(m_gaTrackerInstance==nullptr){
+            m_gaTrackerInstance = new GAnalytics(QVariant(GAUID).toString());
+        }
+    #endif
+    return m_gaTrackerInstance;
+}
 
 
-Stats::Stats(QObject *parent) : QObject(parent)
-{
-
+Stats::Stats(QObject *parent) : QObject(parent){
+#ifdef GAUID
+#endif
 }
 
 void Stats::forceRefreshFromDb(){
@@ -53,4 +63,15 @@ int Stats::logStatWithConfig(QString category, QString action, bool usedCloudina
     }
     emit Stats::getInstance()->statsUpdated();
     return insertedRecordId;
+}
+
+void Stats::fireGaEvent(QString category, QString action, QString label, QVariant value){
+    #ifdef GAUID
+        if (value==NULL){
+            value = QVariant();
+        }
+        if(GlobalSettings::getInstance()->getIsOptedOutTracking()==false){
+            Stats::getInstance()->getGaTracker()->sendEvent(category,action,label,value);
+        }
+    #endif
 }

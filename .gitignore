@@ -46,3 +46,6 @@ CMakeLists.txt.user*
 
 # DB
 dct.db
+
+# config files
+config/*.pro

@@ -10,6 +10,9 @@ CONFIG += qml_debug
 # deprecated API to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+include("config/extradefines.pro")
+
+
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -30,6 +33,7 @@ RESOURCES += qml.qrc
 
 include("models/models.pri")
 include("apis/apis.pri")
+include("lib/qt-google-analytics/qt-google-analytics.pri")
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

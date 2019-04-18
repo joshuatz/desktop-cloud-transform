@@ -44,9 +44,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("JoshuaTzucker");
     QCoreApplication::setOrganizationDomain("joshuatz.com");
     QCoreApplication::setApplicationName("Desktop Cloud Transform");
+    QCoreApplication::setApplicationVersion("0.0.1");
 
     // Log startup :)
     Stats::getInstance()->logStat("application","startup",false);
+    Stats::getInstance()->fireGaEvent("application","startup","",NULL);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
