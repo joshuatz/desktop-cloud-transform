@@ -25,6 +25,7 @@ ApplicationWindow {
         settingsPopup: globalSettingsPopup
         newButtonCallback: (function(){
             configEditorPopup.contentItem.isNewConfig = true;
+            configEditorPopup.contentItem.resetForm();
             configEditorPopup.open();
         })
         helpButtonCallback: (function(){
