@@ -77,7 +77,7 @@ int TransformationList::insertOrUpdateInStorage(TransformationConfig config, boo
     if (Database::connected){
         QSqlQuery insertQuery;
         // Construct SQL query dynamically
-        QString query = "REPLACE INTO " + TransformationList::TABLENAME + " (" + (isUpdate ? "id," : "") + "user_defined_name,save_locally,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_named_trans,named_trans,uses_trans_string,trans_string,store_original,delete_cloud_after_download) VALUES(" + (isUpdate ? ":id," : "") + ":user_defined_name,:save_locally,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,:uses_named_trans,:named_trans,:uses_trans_string,:trans_string,:store_original,:delete_cloud_after_download)";
+        QString query = "REPLACE INTO " + TransformationList::TABLENAME + " (" + (isUpdate ? "id," : "") + "user_defined_name,save_locally,overwrite_local,created_file_suffix,uses_preset,preset_name,uses_named_trans,named_trans,uses_trans_string,trans_string,uses_outgoing_trans,outgoing_trans_string,store_original,delete_cloud_after_download) VALUES(" + (isUpdate ? ":id," : "") + ":user_defined_name,:save_locally,:overwrite_local,:created_file_suffix,:uses_preset,:preset_name,:uses_named_trans,:named_trans,:uses_trans_string,:trans_string,:uses_outgoing_trans,:outgoing_trans_string,:store_original,:delete_cloud_after_download)";
         insertQuery.prepare(query);
         if (isUpdate){
             insertQuery.bindValue(":id",config.id);
@@ -92,6 +92,8 @@ int TransformationList::insertOrUpdateInStorage(TransformationConfig config, boo
         insertQuery.bindValue(":named_trans",config.namedTransformation);
         insertQuery.bindValue(":uses_trans_string",config.usesTransformationRawString);
         insertQuery.bindValue(":trans_string",config.transformationRawString);
+        insertQuery.bindValue(":uses_outgoing_trans",config.usesOutgoingTransformationRawString);
+        insertQuery.bindValue(":outgoing_trans_string",config.outoingTransformationRawString);
         insertQuery.bindValue(":store_original",config.storeOriginal);
         insertQuery.bindValue(":delete_cloud_after_download",config.deleteCloudCopyAfterDownload);
         res = insertQuery.exec();
@@ -126,6 +128,8 @@ TransformationConfig TransformationList::sqlRowToTransformationConfig(QSqlRecord
     result.namedTransformation = row.value("named_trans").toString();
     result.usesTransformationRawString = row.value("uses_trans_string").toBool();
     result.transformationRawString = row.value("trans_string").toString();
+    result.usesOutgoingTransformationRawString = row.value("uses_outgoing_trans").toBool();
+    result.outoingTransformationRawString = row.value("outgoing_trans_string").toString();
     result.storeOriginal = row.value("store_original").toBool();
     result.deleteCloudCopyAfterDownload = row.value("delete_cloud_after_download").toBool();
     return result;
