@@ -75,7 +75,7 @@ Item {
                         id: mainAboutText
                         width: parent.width
                         padding: 10
-                        font.pixelSize: 18
+                        font.pixelSize: 12
                         wrapMode: Text.Wrap
                         text: "Desktop Cloud Transform (DCT) was created by Joshua Tzucker. For more information, visit my website at joshuatz.com, or by clicking the link below"
                     }

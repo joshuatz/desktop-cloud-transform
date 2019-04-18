@@ -16,12 +16,30 @@ Item {
         color: Material.primary
         anchors.fill: parent
         property int numButtons: 2
-        property int spacing: Math.round((root.width - addNewTrButton.width - settingsButton.width) / (numButtons + 1))
+        property int spacing: Math.round((root.width - addNewTrButton.width - settingsButton.width - uploadDownloadStatsWrapper.width) / (numButtons + 1))
+
+        Rectangle {
+            id: uploadDownloadStatsWrapper
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            width: uploadDownloadStats.width + 20
+            height: 40
+            anchors.top: parent.top
+            anchors.topMargin: 20
+            color: Qt.rgba(2/255,66/255,94/255,0.5)
+            Text {
+                anchors.centerIn: parent
+                id: uploadDownloadStats
+                text: "U : " + Stats.cloudinaryTotalUploads + " / D : " + Stats.cloudinaryTotalDownloads
+                color: "white"
+                font.pixelSize: 14
+            }
+        }
 
         Button {
             id: addNewTrButton
             text: qsTr("+ New Configuration")
-            anchors.left: parent.left
+            anchors.left: uploadDownloadStatsWrapper.right
             anchors.leftMargin: container.spacing
             anchors.top: parent.top
             anchors.topMargin: (parent.height - height) / 2

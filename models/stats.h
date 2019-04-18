@@ -9,11 +9,11 @@
 class Stats : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int totalUploads MEMBER totalUploads NOTIFY statsUpdated)
+    Q_PROPERTY(int cloudinaryTotalUploads MEMBER m_cloudinaryUploadCount NOTIFY statsUpdated)
+    Q_PROPERTY(int cloudinaryTotalDownloads MEMBER m_cloudinaryDownloadCount NOTIFY statsUpdated)
 public:
     explicit Stats(QObject *parent = nullptr);
     static Stats *getInstance();
-    int totalUploads;
     static GAnalytics *getGaTracker();
 signals:
     void statsUpdated();
@@ -26,6 +26,10 @@ private:
     static Stats *m_instance;
     static const QString TABLENAME;
     static GAnalytics *m_gaTrackerInstance;
+    static int m_cloudinaryUploadCount;
+    static int m_cloudinaryDownloadCount;
+    static int getCountOfStatOverDuration(QDateTime startDate,QDateTime endDate, QString category, QString action, bool usedCloudinary, int configId);
+    static int getCountOfStatAllTime(QString category, QString action, bool usedCloudinary, int configId);
 };
 
 #endif // STATS_H

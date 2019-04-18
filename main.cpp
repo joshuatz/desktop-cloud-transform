@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
     GlobalSettings::getInstance()->loadFromStorage();
     // Load configs
     TransformationList::getInstance()->loadAllFromStorage();
+    // Load stats
+    Stats::getInstance()->forceRefreshFromDb();
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
@@ -36,6 +38,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("Helpers",&myHelpers);
     engine.rootContext()->setContextProperty("Uploader",Uploader::getInstance());
     engine.rootContext()->setContextProperty("UploadConfigsList",TransformationList::getInstance());
+    engine.rootContext()->setContextProperty("Stats",Stats::getInstance());
     // Register metatypes
     qRegisterMetaType<UploadActionResult>();
     qRegisterMetaType<TransformationConfig>();
