@@ -1,12 +1,13 @@
 #include "uploader.h"
 #include "helpers.h"
 #include "apis/cloudinary.h"
-#include <QClipboard>
-#include <QGuiApplication>
-#include "transformationlist.h"
 #include "downloader.h"
+#include "stats.h"
+#include "transformationlist.h"
+#include <QClipboard>
 #include <QFile>
 #include <QFileInfo>
+#include <QGuiApplication>
 
 Uploader::Uploader(QObject *parent) : QObject(parent)
 {
@@ -49,6 +50,7 @@ UploadActionResult Uploader::mockUploadResult(QString type){
 }
 
 void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationConfig config){
+    Stats::getInstance()->logStat("cloudinary","upload",true);
     QMap<QString,QVariant> params;
     params.insert("filepath",localImageFilePath);
     // Construct a new Uploader instance and attach config and flag it
@@ -65,7 +67,8 @@ void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationCo
         Cloudinary::uploadFileByParamsWUploaderInstance(params,uploaderInstance);
     }
     else {
-        // This is the final upload action.
+        // This is the final upload action - apply transformation WITH upload (so only transformed version is stored in cloud)
+        Stats::getInstance()->logStat("cloudinary","transform",true);
         if (config.usesPreset){
             params.insert("upload_preset",QVariant(config.presetName));
         }
@@ -85,6 +88,7 @@ int Uploader::uploadImageFromLocalPath(QString localImageFilePath){
     // @TODO implement queue system
     int queueNumber = 0;
     if (Helpers::checkValidImageFilePath(localImageFilePath)){
+        Stats::getInstance()->logStat("cloudinary","upload",true);
         Uploader::getInstance()->setUploadInProgress(true);
         this->m_processingIndex = queueNumber;
         qDebug() << "Uploading image. in queue at #" << queueNumber;
@@ -126,9 +130,13 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
             if (this->m_attachedConfigIsInProgress==true){
                 // We need to take the upload result and use for further processing
+                Stats::getInstance()->logStat("cloudinary","transform",true);
                 // We should be able to just construct a URL string from the previously uploaded result, and the transformation part of the config
                 QString computedFinalImageUrl = Cloudinary::generateImageUrlFromConfigAndId(result.id,config);
                 finalImageUrlToDownload = computedFinalImageUrl;
+                // make sure to set the final URL to the computed public image url, not the base image url
+                result.url = computedFinalImageUrl;
+                // Set progress flag
                 this->m_attachedConfigIsInProgress = false;
             }
 
@@ -152,6 +160,8 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                 // Actually download the file to disk
                 qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
                 Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
+                Stats::getInstance()->logStat("application","download",false);
+                Stats::getInstance()->logStat("cloudinary","download",true);
 
                 // Update result
                 // Update result

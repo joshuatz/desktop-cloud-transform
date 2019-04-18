@@ -1,14 +1,15 @@
+#include "apis/cloudinary.h"
+#include "database.h"
+#include "globalsettings.h"
+#include "helpers.h"
+#include "models/stats.h"
+#include "models/transformationlist.h"
+#include "models/transformationconfig.h"
+#include "models/uploader.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QQmlContext>
-#include "helpers.h"
-#include "database.h"
-#include "globalsettings.h"
-#include "models/uploader.h"
-#include "apis/cloudinary.h"
-#include "models/transformationlist.h"
-#include "models/transformationconfig.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,6 +44,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("JoshuaTzucker");
     QCoreApplication::setOrganizationDomain("joshuatz.com");
     QCoreApplication::setApplicationName("Desktop Cloud Transform");
+    QCoreApplication::setApplicationVersion("0.0.1");
+
+    // Log startup :)
+    Stats::getInstance()->logStat("application","startup",false);
+    Stats::getInstance()->fireGaEvent("application","startup","",NULL);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())

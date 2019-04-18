@@ -97,7 +97,17 @@ Item {
                     }
                 }
             }
+            Row {
+                width: parent.width
+                CheckBox {
+                    id: optedOutTrackingCheckbox
+                    text: qsTr("Opt out of sharing of stats (note - this refers to DCT's stat sharing, not Cloudinary's)")
+                    checked: GlobalSettings.optedOutTracking
+                }
+            }
         }
+
+
         Row {
             id: bottomActionBar
             width: parent.width
@@ -132,7 +142,7 @@ Item {
     }
 
     property var submitForm: (function(){
-        var validated = GlobalSettings.updateInBulk(cloudinaryCloudNameInput.text,cloudinaryApiKeyInput.text,cloudinaryApiSecretInput.text);
+        var validated = GlobalSettings.updateInBulk(cloudinaryCloudNameInput.text,cloudinaryApiKeyInput.text,cloudinaryApiSecretInput.text,optedOutTrackingCheckbox.checked);
         if (validated){
             cancelAction();
         }
