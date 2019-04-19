@@ -13,6 +13,7 @@ void Downloader::downloadImageFileToPath(QString remotePath, QString localPath){
     QObject::connect(netManager,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
         if (finishedReply->error()){
             // Uh-Oh!
+            qDebug() << "Downloading file failed! Remote URL = " << remotePath << " || Saving to : " << localPath;
         }
         else {
             QFile *file = new QFile(localPath);

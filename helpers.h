@@ -16,6 +16,8 @@ public slots:
     static bool checkValidImageFilePath(QString imagePath);
     static void copyToClipboard(QString strToCopy);
     static QString formatFilePathForQml(QString filePath);
+    static QString forceEndingSlash(QString input);
+    static QString removeBeginSlash(QString input);
 private:
 };
 
