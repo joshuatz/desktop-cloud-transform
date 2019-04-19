@@ -20,8 +20,8 @@ public:
     using uploaderMemPtr = void (Uploader::*)(bool);
 //    typedef void (Uploader::*uploaderMemPtr)(bool);
 
-//    static void downloadImageFileToPath(QString remotePath,QString localPath,QObject *receiver,UploaderDownloadReceivedPtr slot);
-    static void downloadImageFileToPath(QString remotePath,QString localPath,QObject *receiver,uploaderMemPtr slot);
+//    static void downloadImageFileToPath(QString remotePath,QString localPath,QObject *receiver,uploaderMemPtr slot);
+    static void downloadImageFileToPathWithSlotString(QString remotePath,QString localPath,QObject *receiver,QString slot);
 signals:
     void downloadFinished(bool res);
 public slots:

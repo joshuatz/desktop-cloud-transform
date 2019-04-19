@@ -9,11 +9,56 @@ Downloader *Downloader::getInstance(){
     return m_instance;
 }
 
-void Downloader::downloadImageFileToPath(QString remotePath, QString localPath, QObject *receiver, uploaderMemPtr slot)
+//void Downloader::downloadImageFileToPath(QString remotePath, QString localPath, QObject *receiver, uploaderMemPtr slot)
+//{
+//    qDebug() << "Downloader called with special ptr to member of qobject - Uploader::*";
+////    Downloader::downloadImageFileToPathWithSlot(remotePath,localPath,receiver,SLOT(slot));
+//    Downloader::downloadImageFileToPathWithSlot(remotePath,localPath,receiver,slot);
+//}
+
+void Downloader::downloadImageFileToPathWithSlotString(QString remotePath, QString localPath, QObject *receiver, QString slot)
 {
-    qDebug() << "Downloader called with special ptr to member of qobject - Uploader::*";
-//    Downloader::downloadImageFileToPathWithSlot(remotePath,localPath,receiver,SLOT(slot));
-    Downloader::downloadImageFileToPathWithSlot(remotePath,localPath,receiver,slot);
+    qDebug() << "Downloader function called with receiver and slot";
+    QNetworkAccessManager *netManager = new QNetworkAccessManager();
+    QNetworkRequest request(remotePath);
+    // Set up connect()
+    QObject::connect(netManager,&QNetworkAccessManager::finished,[=](QNetworkReply *finishedReply) {
+        bool downloadWorked = true;
+        if (finishedReply->error()){
+            // Uh-Oh!
+            qDebug() << "Downloading file failed! Remote URL = " << remotePath << " || Saving to : " << localPath;
+            downloadWorked = false;
+        }
+        else {
+            QFile *file = new QFile(localPath);
+            if (file->open(QIODevice::WriteOnly)){
+                file->write(finishedReply->readAll());
+                file->flush();
+                file->close();
+                downloadWorked = true;
+            }
+            else {
+                // Uh-Oh!
+                qDebug() << "Download success, but IO error writing to disc at path : " << localPath;
+                downloadWorked = false;
+            }
+            delete file;
+        }
+        if (receiver!=nullptr){
+
+
+//            QMetaObject::invokeMethod(receiver,slot,Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
+//            QMetaObject::invokeMethod(receiver,slot,Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
+//            QMetaObject::invokeMethod(receiver,std::forward<Functor>(slot),Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
+//            std::invoke(slot,receiver,downloadWorked);
+//            (receiver.*slot)(downloadWorked);
+            QMetaObject::invokeMethod(receiver,slot.toUtf8(),Qt::AutoConnection,Q_ARG(bool,downloadWorked));
+        }
+        emit Downloader::getInstance()->downloadFinished(downloadWorked);
+        finishedReply->deleteLater();
+    });
+    // Make the request
+    netManager->get(request);
 }
 
 Downloader::Downloader(QObject *parent) : QObject(parent)
@@ -180,8 +225,9 @@ void Downloader::downloadImageFileToPathWithSlot(QString remotePath, QString loc
         }
         if (receiver!=nullptr){
 
-//            QMetaObject::invokeMethod(receiver,slot,Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
             QMetaObject::invokeMethod(receiver,slot,Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
+//            QMetaObject::invokeMethod(receiver,slot,Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
+//            QMetaObject::invokeMethod(receiver,std::forward<Functor>(slot),Qt::AutoConnection,Q_RETURN_ARG(bool,downloadWorked));
 //            std::invoke(slot,receiver,downloadWorked);
 //            (receiver.*slot)(downloadWorked);
         }

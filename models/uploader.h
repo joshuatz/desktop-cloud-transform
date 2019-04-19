@@ -46,6 +46,7 @@ public:
     bool getDownloadInProgress();
     void setSuccessOfLastResult(bool success);
     void setMessageOfLastResult(QString message);
+    void receiveDownloadResultMem(bool res);
 signals:
 //    void queueChanged();
     void uploadInProgressChanged();
@@ -54,7 +55,7 @@ signals:
 public slots:
     int uploadImageFromLocalPath(QString localImageFilePath);
     void receiveNetworkReply(QNetworkReply *reply);
-    void receiveDownloadResult(bool res);
+    void receiveDownloadResultSlot(bool res);
     void setUploadInProgress(bool uploadInProgressStatus);
     void setDownloadInProgress(bool updatedDownloadInProgress);
     void uploadImageWithConfig(QString localImageFilePath,TransformationConfig config);
