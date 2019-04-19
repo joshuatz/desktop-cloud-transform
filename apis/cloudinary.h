@@ -46,6 +46,7 @@ public:
     static void getUsageInfoJson(void(*fnPtr)(QJsonObject res));
     static QString generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config);
     typedef QMap<QString,QVariant> cloudinaryParams;
+    static QString getPublicUploadUrlBase();
 private:
     static QString getUploadEndpoint(QString resourceType);
     static QString getAdminBaseEndpoint();

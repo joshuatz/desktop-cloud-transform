@@ -221,6 +221,26 @@ Item {
                             }
                         }
                         Row {
+                            width: parent.width
+                            HelpButton {
+                                id: outgoingRawTransHelpButton
+                                helpText: qsTr("Outoing transformation strings are applied AFTER the image is uploaded. Transformation strings look something like 'w_300,h_300/e_colorize'")
+                            }
+                            CheckBox {
+                                id: usesOutgoingRawTransCheckbox
+                                text: qsTr("Uses an OUTGOING Raw Transformation String")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
+                            }
+                            TextField {
+                                id: outgoingRawTransInput
+                                width: (parent.width - rawTransHelpButton.width - usesRawTransCheckbox.width) * 0.85
+                                placeholderText: "Raw Transformation String"
+                                visible: usesOutgoingRawTransCheckbox.checked
+                            }
+                        }
+                        Row {
                             id: frmRow6
                             width: parent.width
                             HelpButton {
@@ -402,6 +422,14 @@ Item {
         },
         "transformationRawString" : {
             "field" : rawTransInput,
+            "type" : "TextField"
+        },
+        "usesOutgoingTransformationRawString" : {
+            "field" : usesOutgoingRawTransCheckbox,
+            "type" : "CheckBox"
+        },
+        "outoingTransformationRawString" : {
+            "field" : outgoingRawTransInput,
             "type" : "TextField"
         },
         "storeOriginal" : {

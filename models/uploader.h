@@ -50,6 +50,7 @@ public slots:
     void uploadImageWithConfig(QString localImageFilePath,TransformationConfig config);
     void uploadImageWithConfigId(QString localImageFilePath,int configId);
     static UploadActionResult mockUploadResult(QString type);
+    static QString macroReplacer(QString inputString,QString localImageFilePath,QMap<QString,QString> OPT_additionalReplacements);
 private:
     bool m_uploadInProgress = false;
     int m_processingIndex = 0;
