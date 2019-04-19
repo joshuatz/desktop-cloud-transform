@@ -56,6 +56,35 @@ ApplicationWindow {
         background: ThemeColors.darkPrimary
     }
 
+    // SPECIAL - input blocker - this will replace everything excpect for the top bar if something (e.g. cloudinary) needs to be configured in settings.
+    Rectangle {
+        id: obscureBlocker
+        width: parent.width
+        height: parent.height - topBar.height
+        anchors.top: topBar.bottom
+        color: Qt.rgba(255/255,255/255,255/255,0.9)
+        visible: !GlobalSettings.cloudinaryConfigured
+        Rectangle {
+            width: parent.width * 0.7
+            height: parent.height * 0.5
+            anchors.centerIn: parent
+            color: Qt.rgba(255/255,255/255,255/255,0.5)
+            Text {
+                width: parent.width
+                anchors.centerIn: parent
+                text: qsTr("Please configure your credentials in settings (open by clicking the button on the top right")
+                font.pixelSize: 20
+                wrapMode: Text.Wrap
+                padding: 20
+            }
+        }
+        MouseArea {
+            anchors.fill: parent
+            enabled: true
+            propagateComposedEvents: false
+        }
+    }
+
     /**
     * Hidden elements
     */

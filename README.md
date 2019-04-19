@@ -31,14 +31,13 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Incoming transformations on upload - https://cloudinary.com/documentation/upload_images#incoming_transformations
 # TODOS
 ## !! - High priority - !!
+ - Looks like QT is filelocking the image when I display it in the success modal - maybe I can clone it to a temp directory or into memory?
  - Guards / better errors when trying to use app before configuring settings and auth
  - Cleanup QNetworkReply instances - use deleteLater to free up (probs in slot?)
  - Timeout for auto-close of success modal needs to be auto-cancelled if clicked on
- - Add about screen modal - shows when clicking on upper right button
  - DB migrations (for install or upgrade)
  - Cmd line support
 ## Backlog / Should implement
- - Bug fix - downloading file timeout -> switch to signal/slot and delay success modal until file is written out to disc
  - Refactor naming of classes, objects, methods - distinction between transformations and configs
  - Tag items uploaded through this tool to make easier to find online
      - https://cloudinary.com/documentation/image_upload_api_reference#tags_method

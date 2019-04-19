@@ -22,6 +22,7 @@ GlobalSettings *GlobalSettings::getInstance(){
 QString GlobalSettings::TABLE_NAME = "globalsettings";
 
 bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret,bool optedOutTracking){
+    // @TODO refactor and call other validate function
     bool validated = true;
     QList<QString> emptyStringCheck = {cloudinaryCloudName,cloudinaryApiKey,cloudinaryApiSecret};
     // Check for empty strings
@@ -32,26 +33,30 @@ bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinar
         }
     }
     if (validated){
+        m_cloudinaryProperlyConfigured = true;
         m_cloudinaryCloudName = cloudinaryCloudName;
         m_cloudinaryApiKey = cloudinaryApiKey;
         m_cloudinaryApiSecret = cloudinaryApiSecret;
         m_optedOutTracking = optedOutTracking;
         this->saveToStorage();
-        emit settingsChanged();
     }
+    else {
+        m_cloudinaryProperlyConfigured = false;
+    }
+    emit settingsChanged();
     return validated;
 }
 
 void GlobalSettings::loadFromStorage(){
-    // @TODO
     m_cloudinaryCloudName = getSettingFromDb("cloudinaryCloudName").value.toString();
     m_cloudinaryApiKey = getSettingFromDb("cloudinaryApiKey").value.toString();
     m_cloudinaryApiSecret = getSettingFromDb("cloudinaryApiSecret").value.toString();
     m_optedOutTracking = getSettingFromDb("opted_out_tracking").value.toBool();
+    m_cloudinaryProperlyConfigured = this->validateCloudinarySettings();
+    emit settingsChanged();
 }
 
 void GlobalSettings::saveToStorage(){
-    // @TODO
     saveSettingToDb("cloudinaryCloudName",this->m_cloudinaryCloudName);
     saveSettingToDb("cloudinaryApiKey",this->m_cloudinaryApiKey);
     saveSettingToDb("cloudinaryApiSecret",this->m_cloudinaryApiSecret);
@@ -81,4 +86,17 @@ bool GlobalSettings::saveSettingToDb(QString settingKey, QVariant settingVal){
         res = query.exec();
     }
     return res;
+}
+
+bool GlobalSettings::validateCloudinarySettings(){
+    bool validated = true;
+    QList<QString> emptyStringCheck = {this->m_cloudinaryCloudName,this->m_cloudinaryApiKey,this->m_cloudinaryApiSecret};
+    // Check for empty strings
+    for (int x=0; x<emptyStringCheck.length(); x++){
+        if (emptyStringCheck[x]==""){
+            validated = false;
+            break;
+        }
+    }
+    return validated;
 }

@@ -47,6 +47,7 @@ Item {
             onClicked: {
                 root.newButtonCallback();
             }
+            visible: GlobalSettings.cloudinaryConfigured
         }
         Button {
             id: settingsButton
