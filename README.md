@@ -32,11 +32,14 @@ Row | Category | Action | Uses Cloudinary (credits)
 # TODOS
 ## !! - High priority - !!
  - Looks like QT is filelocking the image when I display it in the success modal - maybe I can clone it to a temp directory or into memory?
- - Guards / better errors when trying to use app before configuring settings and auth
+     - Not sure there is going to be an easy solution to this. I think this coming from using QImage (Image{} QML) natively.
+         - Idea A) Copy downloaded file to temp dir (same as install or use some QT-get-sysdir type call). Delete after success modal closed, or on timer loop (or on app close or open)
+         - Idea B) See if can use JS-in-QML to do something like copy image to canvas, or some other element that might force it into memory vs accessing off disk
+         - Idea C) When downloading for user, read into memory as native QPixMap or something like that. Then send to QML layer as a pseudo image (not a resource URL)
  - Cleanup QNetworkReply instances - use deleteLater to free up (probs in slot?)
  - Timeout for auto-close of success modal needs to be auto-cancelled if clicked on
+     - For right now, just removed auto-close entirely
  - DB migrations (for install or upgrade)
- - Cmd line support
 ## Backlog / Should implement
  - Refactor naming of classes, objects, methods - distinction between transformations and configs
  - Tag items uploaded through this tool to make easier to find online
@@ -44,6 +47,7 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Internal stats collection and display to user
      - Optional: API quota warning configured through globalSettings
  - Unit tests
+ - Cmd line support
  - Use richtext in textarea for link - https://doc.qt.io/qt-5/richtext-html-subset.html
 ## Icebox / optional:
  - When uploading images, use filename to check if already uploaded, and if so, offer option to "rename" version on cloudinary sever
