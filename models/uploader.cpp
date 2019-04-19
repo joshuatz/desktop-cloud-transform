@@ -13,7 +13,6 @@
 
 Uploader::Uploader(QObject *parent) : QObject(parent)
 {
-
 }
 
 Uploader *Uploader::m_instance = nullptr;
@@ -21,6 +20,7 @@ Uploader *Uploader::m_instance = nullptr;
 Uploader *Uploader::getInstance(){
     if (m_instance == nullptr){
         m_instance = new Uploader();
+//        QObject::connect(Downloader::getInstance(),&Downloader::downloadFinished,m_instance,&Uploader::receiveDownloadResult);
     }
     return m_instance;
 }
@@ -68,17 +68,19 @@ QString Uploader::macroReplacer(QString inputString, QString localImageFilePath,
     QFileInfo fileInfo(localImageFilePath);
     if (fileInfo.exists()){
         replacerMap.insert("{filename}",fileInfo.fileName());
+        replacerMap.insert("{filenameNoExt}",fileInfo.baseName());
+        replacerMap.insert("{basename}",fileInfo.baseName());
         replacerMap.insert("{created_epochs}",QString::number(fileInfo.birthTime().toSecsSinceEpoch()));
     }
 
     QMap<QString,QString>::iterator i;
-    for (i = OPT_additionalReplacements.begin(); i != OPT_additionalReplacements.end(); ++i){
+    for (i = replacerMap.begin(); i != replacerMap.end(); ++i){
         QString macro = i.key();
         QString macroVal = i.value();
         if (validMacroPattern.match(macro).hasMatch()==false){
             macro = "{" + macro + "}";
         }
-        finalString = finalString.replace(macro,macroVal,Qt::CaseSensitivity::CaseInsensitive);
+        finalString = finalString.replace(macro,macroVal,Qt::CaseInsensitive);
     }
     return finalString;
 }
@@ -136,6 +138,8 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
     // Used to indicate that the image that was just uploaded was "raw" without a config applied
     bool uploadWasRawFlag = false;
+    // Flag to indicate that a download is going to be triggered that will delay the "success" of the current chain of events
+    bool waitingOnDownload = false;
 
     qDebug() << "Running in slot of Uploader class!";
     QString data = (QString) reply->readAll();
@@ -150,8 +154,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
     if (reply->error()){
         result.success = false;
         qDebug() << "network reply error!";
-
-        // @TODO handle this better!
+        result.messageString = "Error in response from Cloudinary";
     }
     else {
         result.success = true;
@@ -209,10 +212,14 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                     // Set the final fetch url to the cloudinary upload base URL + computed trans string, and count as ANOTHER trans credit use
                     Stats::getInstance()->logStat("cloudinary","transform",true);
                     finalImageUrlToDownload = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase()) + Helpers::removeBeginSlash(finalOutgoingTransString);
+                    result.url = finalImageUrlToDownload;
                 }
             }
 
             if (config.saveLocally){
+                // Set flag to block success signal until download complete
+                waitingOnDownload = true;
+
                 QFileInfo fileInfo = QFileInfo(this->m_localFilePath);
                 QString pathToSaveFileTo = this->m_localFilePath;
 
@@ -226,13 +233,22 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
                 // Actually download the file to disk
                 qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
-                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
+
+                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo,this,&Uploader::receiveDownloadResult);
+//                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
+
+//                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo,[this](bool res){
+
+//                });
+
                 Stats::getInstance()->logStat("application","download",false);
                 Stats::getInstance()->logStat("cloudinary","download",true);
 
                 // Update result
                 result.savedLocally = true;
                 result.localSavePath = pathToSaveFileTo;
+                // This success will be changed in the callback to download - depending on if download succeeds
+                result.success = false;
 
                 if (config.deleteCloudCopyAfterDownload){
                     // @TODO
@@ -251,10 +267,10 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
     Uploader::getInstance()->m_lastUploadActionResult = result;
     // Finally, regardless of actual reply, close out the pending upload - this will also emit
     this->setUploadInProgress(false);
-    QTimer::singleShot(400,[](){
-        Uploader::getInstance()->setUploadInProgress(false);
+    Uploader::getInstance()->setUploadInProgress(false);
+    if (waitingOnDownload==false){
         emit Uploader::getInstance()->uploadActionResultReceived();
-    });
+    }
 }
 
 void Uploader::setUploadInProgress(bool uploadInProgressStatus){
@@ -267,4 +283,43 @@ void Uploader::setUploadInProgress(bool uploadInProgressStatus){
 
 UploadActionResult Uploader::getLastUploadResult(){
     return m_lastUploadActionResult;
+}
+
+void Uploader::receiveDownloadResult(bool res){
+    qDebug() << "Running in slot receiveDownloadResult!";
+    qDebug() << res;
+    Uploader::getInstance()->setSuccessOfLastResult(res);
+    if (!res){
+        this->setMessageOfLastResult("Download failed!");
+    }
+    if(this->getUploadInProgress()){
+        // finish out chain and emit event
+        this->setUploadInProgress(false);
+        emit Uploader::getInstance()->uploadActionResultReceived();
+    }
+    // Regardless of success, set downloading flag to false
+    this->setDownloadInProgress(false);
+}
+
+bool Uploader::getUploadInProgress(){
+    return m_uploadInProgress;
+}
+
+bool Uploader::getDownloadInProgress(){
+    return m_downloadInProgress;
+}
+
+void Uploader::setDownloadInProgress(bool updatedDownloadInProgress){
+    if (m_downloadInProgress!=updatedDownloadInProgress){
+        m_downloadInProgress = updatedDownloadInProgress;
+        emit Uploader::getInstance()->downloadInProgressChanged();
+    }
+}
+
+void Uploader::setSuccessOfLastResult(bool success){
+    this->m_lastUploadActionResult.success = success;
+}
+
+void Uploader::setMessageOfLastResult(QString message){
+    this->m_lastUploadActionResult.messageString = message;
 }

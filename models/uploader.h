@@ -14,6 +14,7 @@ struct UploadActionResult {
     TransformationConfig attachedConfig;
     bool savedLocally = false;
     QString localSavePath = "";
+    QString messageString = "";
     UploadActionResult(bool success = false,QString url="",QString id="") :
         success(success),
         url(url),
@@ -28,25 +29,34 @@ struct UploadActionResult {
         Q_PROPERTY(TransformationConfig attachedConfig MEMBER attachedConfig)
         Q_PROPERTY(bool savedLocally MEMBER savedLocally)
         Q_PROPERTY(QString localSavePath MEMBER localSavePath)
+        Q_PROPERTY(QString messageString MEMBER messageString)
 };
 
 class Uploader : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool uploadInProgress MEMBER m_uploadInProgress NOTIFY uploadInProgressChanged)
+    Q_PROPERTY(bool downloadInProgress MEMBER m_downloadInProgress NOTIFY downloadInProgressChanged)
     Q_PROPERTY(UploadActionResult lastUploadActionResult READ getLastUploadResult NOTIFY uploadActionResultReceived)
 public:
     explicit Uploader(QObject *parent = nullptr);
     static Uploader *getInstance();
     UploadActionResult getLastUploadResult();
+    bool getUploadInProgress();
+    bool getDownloadInProgress();
+    void setSuccessOfLastResult(bool success);
+    void setMessageOfLastResult(QString message);
 signals:
 //    void queueChanged();
     void uploadInProgressChanged();
+    void downloadInProgressChanged();
     void uploadActionResultReceived();
 public slots:
     int uploadImageFromLocalPath(QString localImageFilePath);
     void receiveNetworkReply(QNetworkReply *reply);
+    void receiveDownloadResult(bool res);
     void setUploadInProgress(bool uploadInProgressStatus);
+    void setDownloadInProgress(bool updatedDownloadInProgress);
     void uploadImageWithConfig(QString localImageFilePath,TransformationConfig config);
     void uploadImageWithConfigId(QString localImageFilePath,int configId);
     static UploadActionResult mockUploadResult(QString type);
@@ -61,6 +71,7 @@ private:
     TransformationConfig m_attachedConfig;
     bool m_attachedConfigIsInProgress = false;
     QString m_localFilePath;
+    bool m_downloadInProgress = false;
 };
 
 Q_DECLARE_METATYPE(UploadActionResult);

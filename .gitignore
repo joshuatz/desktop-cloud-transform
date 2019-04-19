@@ -49,3 +49,6 @@ dct.db
 
 # config files
 config/*.pro
+
+# misc
+scratchpad.txt

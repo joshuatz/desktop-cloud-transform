@@ -161,7 +161,6 @@ ApplicationWindow {
                     implicitWidth: 200
                     width: mainProgressBarModal.width
                     implicitHeight: 80
-//                    height: parent.height
                     indeterminate: mainProgressBarModal.indeterminate
                     progress: mainProgressBar.position
                     scale: mainProgressBar.mirrored ? -1 : 1
@@ -206,9 +205,18 @@ ApplicationWindow {
     property bool applicationHasInitialized: false
     property bool uploadInProgress: Uploader.uploadInProgress
     onUploadInProgressChanged: {
-        mainProgressBarModal.visible = root.uploadInProgress
-        console.log("uploading changed");
+        root.updateProgressBar();
     }
+    property bool downloadInProgress: Uploader.downloadInProgress
+    onDownloadInProgressChanged: {
+        root.updateProgressBar();
+    }
+
+    property var updateProgressBar: (function(){
+        mainProgressBarModal.visible = (root.uploadInProgress || root.downloadInProgress);
+        mainProgressBarModal.text = root.uploadInProgress ? "Uploading..." : "Downloading...";
+    })
+
     property var lastUploadResult: Uploader.lastUploadActionResult
     onLastUploadResultChanged: {
         if (root.applicationHasInitialized){
