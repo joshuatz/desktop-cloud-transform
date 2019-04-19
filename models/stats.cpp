@@ -39,7 +39,7 @@ Stats::Stats(QObject *parent) : QObject(parent){
 void Stats::forceRefreshFromDb(){
     if (Database::connected){
         m_cloudinaryUploadCount = Stats::getCountOfStatAllTime("cloudinary","upload",true,-1);
-        m_cloudinaryUploadCount = Stats::getCountOfStatAllTime("cloudinary","download",true,-1);
+        m_cloudinaryDownloadCount = Stats::getCountOfStatAllTime("cloudinary","download",true,-1);
         emit Stats::getInstance()->statsUpdated();
     }
 }
