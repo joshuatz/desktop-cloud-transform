@@ -160,9 +160,13 @@ QString Cloudinary::getUploadEndpoint(QString resourceType){
     return "https://api.cloudinary.com/v1_1/" + GlobalSettings::getInstance()->getCloudinaryCloudName()  + "/" + resourceType + "/upload";
 }
 
+QString Cloudinary::getPublicUploadUrlBase(){
+    return "https://res.cloudinary.com/" + GlobalSettings::getInstance()->getCloudinaryCloudName() + "/image/upload";
+}
+
 QString Cloudinary::generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config){
     // Construct the base URL
-    QString publicUrl = "https://res.cloudinary.com/" + GlobalSettings::getInstance()->getCloudinaryCloudName() + "/image/upload/";
+    QString publicUrl = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase());
     if (config.usesPreset){
         // This can only be used with uploads, not with public URLs
     }

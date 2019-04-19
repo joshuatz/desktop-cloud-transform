@@ -16,12 +16,14 @@ struct settingDbResult {
 class GlobalSettings : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool cloudinaryConfigured MEMBER m_cloudinaryProperlyConfigured NOTIFY settingsChanged)
     Q_PROPERTY(QString cloudinaryCloudName MEMBER m_cloudinaryCloudName NOTIFY settingsChanged)
     Q_PROPERTY(bool optedOutTracking MEMBER m_optedOutTracking NOTIFY settingsChanged)
 public:
     explicit GlobalSettings(QObject *parent = nullptr);
     static GlobalSettings *getInstance();
     static QString TABLE_NAME;
+    bool validateCloudinarySettings();
 signals:
     void settingsChanged();
     void internetConnectionChanged();
@@ -43,6 +45,7 @@ public slots:
     }
 private:
     static GlobalSettings *m_instance;
+    bool m_cloudinaryProperlyConfigured = false;
     QString m_cloudinaryCloudName;
     QString m_cloudinaryApiKey;
     QString m_cloudinaryApiSecret;

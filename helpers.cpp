@@ -63,3 +63,19 @@ QString Helpers::formatFilePathForQml(QString filePath){
     }
     return formattedPath;
 }
+
+QString Helpers::forceEndingSlash(QString input){
+    QString output = input;
+    if (output.endsWith("/")==false){
+        output+= "/";
+    }
+    return output;
+}
+
+QString Helpers::removeBeginSlash(QString input){
+    QString output = input;
+    if (output.startsWith("/")){
+        output.remove(QRegularExpression("^\\/"));
+    }
+    return output;
+}

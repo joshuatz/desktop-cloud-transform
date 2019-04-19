@@ -22,6 +22,8 @@ public:
     QString namedTransformation = "";
     bool usesTransformationRawString = false;
     QString transformationRawString = "";
+    bool usesOutgoingTransformationRawString = false;
+    QString outoingTransformationRawString = "";
     bool storeOriginal = false;
     bool deleteCloudCopyAfterDownload = false;
     // Needed for MOC
@@ -39,6 +41,8 @@ Q_GADGET
     Q_PROPERTY(QString namedTransformation MEMBER namedTransformation)
     Q_PROPERTY(bool usesTransformationRawString MEMBER usesTransformationRawString)
     Q_PROPERTY(QString transformationRawString MEMBER transformationRawString)
+    Q_PROPERTY(bool usesOutgoingTransformationRawString MEMBER usesOutgoingTransformationRawString)
+    Q_PROPERTY(QString outoingTransformationRawString MEMBER outoingTransformationRawString)
     Q_PROPERTY(bool storeOriginal MEMBER storeOriginal)
     Q_PROPERTY(bool deleteCloudCopyAfterDownload MEMBER deleteCloudCopyAfterDownload)
 private:

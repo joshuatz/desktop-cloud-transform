@@ -53,13 +53,6 @@ Item {
                         anchors.leftMargin: 10
                         clip: false
                         // There seems to be a bug in column and its own computed height - changing visibility of a row is not changing the computation automatically
-                        property real computedHeight: frmRow1.height + frmRow2.height + localSaveOptionsSection.height + frmRow3.height + frmRow4.height + frmRow5.height + frmRow6.height + frmRow7.height + heightBuffer
-                        property real heightBuffer: 300
-//                        height: frmColumn.computedHeight
-                        onHeightChanged: {
-                            console.log("frmColumn height = " + frmColumn.height);
-                            console.log("frmColumn COMPUTED height = " + frmColumn.computedHeight);
-                        }
                         move: Transition {
                             NumberAnimation { properties: "x,y"; duration: 200 }
                         }
@@ -208,7 +201,6 @@ Item {
                             }
                         }
                         Row {
-                            id: frmRow5
                             width: parent.width
                             HelpButton {
                                 id: rawTransHelpButton
@@ -226,6 +218,26 @@ Item {
                                 width: (parent.width - rawTransHelpButton.width - usesRawTransCheckbox.width) * 0.85
                                 placeholderText: "Raw Transformation String"
                                 visible: usesRawTransCheckbox.checked
+                            }
+                        }
+                        Row {
+                            width: parent.width
+                            HelpButton {
+                                id: outgoingRawTransHelpButton
+                                helpText: qsTr("Outoing transformation strings are applied AFTER the image is uploaded. Transformation strings look something like 'w_300,h_300/e_colorize'")
+                            }
+                            CheckBox {
+                                id: usesOutgoingRawTransCheckbox
+                                text: qsTr("Uses an OUTGOING Raw Transformation String")
+                                onCheckStateChanged: {
+                                    root.comboValidator();
+                                }
+                            }
+                            TextField {
+                                id: outgoingRawTransInput
+                                width: (parent.width - rawTransHelpButton.width - usesRawTransCheckbox.width) * 0.85
+                                placeholderText: "Raw Transformation String"
+                                visible: usesOutgoingRawTransCheckbox.checked
                             }
                         }
                         Row {
@@ -351,7 +363,8 @@ Item {
         console.log(JSON.stringify(configObj));
 
         if (validated){
-            submitSuccess = UploadConfigsList.insertOrUpdateInStorage(configObj,!root.isNewConfig);
+            var newConfigId = UploadConfigsList.insertOrUpdateInStorage(configObj,!root.isNewConfig);
+            submitSuccess = newConfigId >= 0;
             if (submitSuccess){
                 if (root.isNewConfig){
                     globalToastManager.show("Config Created!");
@@ -411,6 +424,14 @@ Item {
             "field" : rawTransInput,
             "type" : "TextField"
         },
+        "usesOutgoingTransformationRawString" : {
+            "field" : usesOutgoingRawTransCheckbox,
+            "type" : "CheckBox"
+        },
+        "outoingTransformationRawString" : {
+            "field" : outgoingRawTransInput,
+            "type" : "TextField"
+        },
         "storeOriginal" : {
             "field" : storeOriginalCheckbox,
             "type" : "CheckBox"
@@ -421,8 +442,8 @@ Item {
         }
     }
 
-    property var mapConfigToFields: (function(){
-        if (root.isNewConfig == false){
+    property var mapConfigToFields: (function(force){
+        if (root.isNewConfig == false || force===true){
         var mapping = root.configMapping;
             for (var x=0; x<Object.keys(mapping).length; x++){
                 var qPropName = Object.keys(mapping)[x];
@@ -474,6 +495,15 @@ Item {
             usesNamedTransCheckbox.checked = false;
             usesRawTransCheckbox.checked = false;
         }
+        if (usesNamedTransCheckbox.checked){
+            usesPresetCheckbox.checked = false;
+            usesRawTransCheckbox.checked = false;
+        }
+    })
+
+    property var resetForm: (function(){
+        root.attachedConfig = UploadConfigsList.getBlankTransformationConfig();
+        root.mapConfigToFields(true);
     })
 
     Component.onCompleted: {
