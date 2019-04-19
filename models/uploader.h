@@ -46,7 +46,6 @@ public:
     bool getDownloadInProgress();
     void setSuccessOfLastResult(bool success);
     void setMessageOfLastResult(QString message);
-    void receiveDownloadResultMem(bool res);
 signals:
 //    void queueChanged();
     void uploadInProgressChanged();

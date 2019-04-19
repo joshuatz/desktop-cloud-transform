@@ -20,7 +20,6 @@ Uploader *Uploader::m_instance = nullptr;
 Uploader *Uploader::getInstance(){
     if (m_instance == nullptr){
         m_instance = new Uploader();
-//        QObject::connect(Downloader::getInstance(),&Downloader::downloadFinished,m_instance,&Uploader::receiveDownloadResult);
     }
     return m_instance;
 }
@@ -233,17 +232,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
                 // Actually download the file to disk
                 qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
-
-
-//                Downloader::downloadImageFileToPathWithSlot(finalImageUrlToDownload,pathToSaveFileTo,this,&Uploader::receiveDownloadResultSlot);
                 Downloader::downloadImageFileToPathWithSlotString(finalImageUrlToDownload,pathToSaveFileTo,this,"receiveDownloadResultSlot");
-//                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo,this,&Uploader::receiveDownloadResultSlot);
-//                Downloader::downloadImageFileToPathWithSlot(finalImageUrlToDownload,pathToSaveFileTo,this,&Uploader::receiveDownloadResult);
-//                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo);
-
-//                Downloader::downloadImageFileToPath(finalImageUrlToDownload,pathToSaveFileTo,[this](bool res){
-
-//                });
 
                 Stats::getInstance()->logStat("application","download",false);
                 Stats::getInstance()->logStat("cloudinary","download",true);
@@ -326,8 +315,4 @@ void Uploader::setSuccessOfLastResult(bool success){
 
 void Uploader::setMessageOfLastResult(QString message){
     this->m_lastUploadActionResult.messageString = message;
-}
-
-void Uploader::receiveDownloadResultMem(bool res){
-    //
 }
