@@ -44,8 +44,10 @@ public:
     UploadActionResult getLastUploadResult();
     bool getUploadInProgress();
     bool getDownloadInProgress();
+    bool getActionChainInProgress();
     void setSuccessOfLastResult(bool success);
     void setMessageOfLastResult(QString message);
+    void setActionChainInProgress(bool inProgress);
 signals:
 //    void queueChanged();
     void uploadInProgressChanged();
@@ -63,15 +65,18 @@ public slots:
     static QString macroReplacer(QString inputString,QString localImageFilePath,QMap<QString,QString> OPT_additionalReplacements);
 private:
     bool m_uploadInProgress = false;
+    bool m_downloadInProgress = false;
+    // Attached configs finish out when all the upload stuff and generation of final URLs has finished. They finish before downloads are done.
+    bool m_attachedConfigIsInProgress = false;
+    // The action chain is not done until absolutely everything is done - including downloading images
+    bool m_actionChainInProgress = false;
     int m_processingIndex = 0;
     int m_processingQueueLength = 0;
     UploadActionResult m_lastUploadActionResult;
     static Uploader *m_instance;
     bool m_hasAttachedConfig = false;
     TransformationConfig m_attachedConfig;
-    bool m_attachedConfigIsInProgress = false;
     QString m_localFilePath;
-    bool m_downloadInProgress = false;
 };
 
 Q_DECLARE_METATYPE(UploadActionResult);

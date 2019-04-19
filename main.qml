@@ -232,7 +232,8 @@ ApplicationWindow {
             }
             else {
                 // @TODO replace with animated toast
-                globalToastManager.show("Upload failed!");
+                var msg = root.lastUploadResult.messageString !== "" ? root.lastUploadResult.messageString : "Unknown Error!";
+                globalToastManager.show(msg);
             }
         }
     }

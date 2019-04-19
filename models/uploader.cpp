@@ -25,6 +25,7 @@ Uploader *Uploader::getInstance(){
 }
 
 void Uploader::uploadImageWithConfigId(QString localImageFilePath,int configId){
+    this->setActionChainInProgress(true);
     TransformationConfig config = TransformationList::getConfigById(configId);
     this->uploadImageWithConfig(localImageFilePath,config);
 }
@@ -85,6 +86,7 @@ QString Uploader::macroReplacer(QString inputString, QString localImageFilePath,
 }
 
 void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationConfig config){
+    this->setActionChainInProgress(true);
     Stats::getInstance()->logStat("cloudinary","upload",true);
     QMap<QString,QVariant> params;
     params.insert("filepath",localImageFilePath);
@@ -134,7 +136,7 @@ int Uploader::uploadImageFromLocalPath(QString localImageFilePath){
 
 void Uploader::receiveNetworkReply(QNetworkReply *reply){
     // This can run in a sep instance, so make sure state changes are sent to the right instance
-
+    this->setActionChainInProgress(true);
     // Used to indicate that the image that was just uploaded was "raw" without a config applied
     bool uploadWasRawFlag = false;
     // Flag to indicate that a download is going to be triggered that will delay the "success" of the current chain of events
@@ -262,7 +264,9 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
     this->setUploadInProgress(false);
     Uploader::getInstance()->setUploadInProgress(false);
     if (waitingOnDownload==false){
+        this->setActionChainInProgress(false);
         emit Uploader::getInstance()->uploadActionResultReceived();
+        qDebug() << "Action chain was finished out in receiveNetworkReply";
     }
 }
 
@@ -284,11 +288,13 @@ void Uploader::receiveDownloadResultSlot(bool res){
     Uploader::getInstance()->setSuccessOfLastResult(res);
     if (!res){
         this->setMessageOfLastResult("Download failed!");
+        Uploader::getInstance()->setMessageOfLastResult("Download failed!");
     }
-    if(this->getUploadInProgress()){
+    if(this->getActionChainInProgress()){
         // finish out chain and emit event
-        this->setUploadInProgress(false);
+        this->setActionChainInProgress(false);
         emit Uploader::getInstance()->uploadActionResultReceived();
+        qDebug() << "Action chain was finished out in receiveDownloadResultSlot";
     }
     // Regardless of success, set downloading flag to false
     this->setDownloadInProgress(false);
@@ -315,4 +321,14 @@ void Uploader::setSuccessOfLastResult(bool success){
 
 void Uploader::setMessageOfLastResult(QString message){
     this->m_lastUploadActionResult.messageString = message;
+}
+
+bool Uploader::getActionChainInProgress(){
+    return this->m_actionChainInProgress;
+}
+
+void Uploader::setActionChainInProgress(bool inProgress){
+    if (this->m_actionChainInProgress!=inProgress){
+        this->m_actionChainInProgress = inProgress;
+    }
 }
