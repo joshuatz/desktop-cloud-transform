@@ -56,6 +56,35 @@ ApplicationWindow {
         background: ThemeColors.darkPrimary
     }
 
+    // SPECIAL - input blocker - this will replace everything excpect for the top bar if something (e.g. cloudinary) needs to be configured in settings.
+    Rectangle {
+        id: obscureBlocker
+        width: parent.width
+        height: parent.height - topBar.height
+        anchors.top: topBar.bottom
+        color: Qt.rgba(255/255,255/255,255/255,0.9)
+        visible: !GlobalSettings.cloudinaryConfigured
+        Rectangle {
+            width: parent.width * 0.7
+            height: parent.height * 0.5
+            anchors.centerIn: parent
+            color: Qt.rgba(255/255,255/255,255/255,0.5)
+            Text {
+                width: parent.width
+                anchors.centerIn: parent
+                text: qsTr("Please configure your credentials in settings (open by clicking the button on the top right")
+                font.pixelSize: 20
+                wrapMode: Text.Wrap
+                padding: 20
+            }
+        }
+        MouseArea {
+            anchors.fill: parent
+            enabled: true
+            propagateComposedEvents: false
+        }
+    }
+
     /**
     * Hidden elements
     */
@@ -161,7 +190,6 @@ ApplicationWindow {
                     implicitWidth: 200
                     width: mainProgressBarModal.width
                     implicitHeight: 80
-//                    height: parent.height
                     indeterminate: mainProgressBarModal.indeterminate
                     progress: mainProgressBar.position
                     scale: mainProgressBar.mirrored ? -1 : 1
@@ -206,9 +234,18 @@ ApplicationWindow {
     property bool applicationHasInitialized: false
     property bool uploadInProgress: Uploader.uploadInProgress
     onUploadInProgressChanged: {
-        mainProgressBarModal.visible = root.uploadInProgress
-        console.log("uploading changed");
+        root.updateProgressBar();
     }
+    property bool downloadInProgress: Uploader.downloadInProgress
+    onDownloadInProgressChanged: {
+        root.updateProgressBar();
+    }
+
+    property var updateProgressBar: (function(){
+        mainProgressBarModal.visible = (root.uploadInProgress || root.downloadInProgress);
+        mainProgressBarModal.text = root.uploadInProgress ? "Uploading..." : "Downloading...";
+    })
+
     property var lastUploadResult: Uploader.lastUploadActionResult
     onLastUploadResultChanged: {
         if (root.applicationHasInitialized){
@@ -224,7 +261,8 @@ ApplicationWindow {
             }
             else {
                 // @TODO replace with animated toast
-                globalToastManager.show("Upload failed!");
+                var msg = root.lastUploadResult.messageString !== "" ? root.lastUploadResult.messageString : "Unknown Error!";
+                globalToastManager.show(msg);
             }
         }
     }
