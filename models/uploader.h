@@ -48,11 +48,14 @@ public:
     void setSuccessOfLastResult(bool success);
     void setMessageOfLastResult(QString message);
     void setActionChainInProgress(bool inProgress);
+    void setDeletionInProgress(bool inProgress);
 signals:
 //    void queueChanged();
     void uploadInProgressChanged();
     void downloadInProgressChanged();
     void uploadActionResultReceived();
+    void actionChainInProgressChanged();
+    void deletionInProgressChanged();
 public slots:
     int uploadImageFromLocalPath(QString localImageFilePath);
     void receiveNetworkReply(QNetworkReply *reply);
@@ -66,6 +69,8 @@ public slots:
 private:
     bool m_uploadInProgress = false;
     bool m_downloadInProgress = false;
+    bool m_deletionInProgress = false;
+    QList<QString> m_queuedDeletes;
     // Attached configs finish out when all the upload stuff and generation of final URLs has finished. They finish before downloads are done.
     bool m_attachedConfigIsInProgress = false;
     // The action chain is not done until absolutely everything is done - including downloading images

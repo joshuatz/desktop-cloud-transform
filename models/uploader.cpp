@@ -2,6 +2,7 @@
 #include "helpers.h"
 #include "apis/cloudinary.h"
 #include "downloader.h"
+#include "globalsettings.h"
 #include "stats.h"
 #include "transformationlist.h"
 #include <QClipboard>
@@ -72,6 +73,12 @@ QString Uploader::macroReplacer(QString inputString, QString localImageFilePath,
         replacerMap.insert("{basename}",fileInfo.baseName());
         replacerMap.insert("{created_epochs}",QString::number(fileInfo.birthTime().toSecsSinceEpoch()));
     }
+
+    // Account details
+    replacerMap.insert("{cloudinarycloudname}",GlobalSettings::getInstance()->getCloudinaryCloudName());
+
+    // Misc
+    replacerMap.insert("{timestamp}",QString::number(QDateTime::currentDateTime().toSecsSinceEpoch()));
 
     QMap<QString,QString>::iterator i;
     for (i = replacerMap.begin(); i != replacerMap.end(); ++i){
@@ -212,7 +219,13 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                     finalOutgoingTransString = Uploader::macroReplacer(finalOutgoingTransString,this->m_localFilePath,QMap<QString,QString>());
                     // Set the final fetch url to the cloudinary upload base URL + computed trans string, and count as ANOTHER trans credit use
                     Stats::getInstance()->logStat("cloudinary","transform",true);
-                    finalImageUrlToDownload = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase()) + Helpers::removeBeginSlash(finalOutgoingTransString);
+                    // Check to see if user specified their own download URL instead of just a trans string
+                    if (finalOutgoingTransString.startsWith("http",Qt::CaseInsensitive) || finalOutgoingTransString.startsWith("www.",Qt::CaseInsensitive)){
+                        finalImageUrlToDownload = finalOutgoingTransString;
+                    }
+                    else {
+                        finalImageUrlToDownload = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase()) + Helpers::removeBeginSlash(finalOutgoingTransString);
+                    }
                     result.url = finalImageUrlToDownload;
                 }
             }
@@ -232,9 +245,14 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                     }
                 }
 
+                if (config.deleteCloudCopyAfterDownload){
+                    // Since the download method is async, store the ID of the asset that should be deleted in a list
+                    this->m_queuedDeletes.append(result.id);
+                }
+
                 // Actually download the file to disk
                 qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
-                Downloader::downloadImageFileToPathWithSlotString(finalImageUrlToDownload,pathToSaveFileTo,this,"receiveDownloadResultSlot");
+                Downloader::downloadImageFileToPathWithSlotString(finalImageUrlToDownload,pathToSaveFileTo,result.id,this,"receiveDownloadResultSlot");
 
                 Stats::getInstance()->logStat("application","download",false);
                 Stats::getInstance()->logStat("cloudinary","download",true);
@@ -244,10 +262,6 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                 result.localSavePath = pathToSaveFileTo;
                 // This success will be changed in the callback to download - depending on if download succeeds
                 result.success = false;
-
-                if (config.deleteCloudCopyAfterDownload){
-                    // @TODO
-                }
             }
         }
         else {
@@ -286,6 +300,15 @@ void Uploader::receiveDownloadResultSlot(bool res){
     qDebug() << "Running in slot receiveDownloadResult!";
     qDebug() << res;
     Uploader::getInstance()->setSuccessOfLastResult(res);
+    // now that the download is done (regardless of success), see if we can delete some cloud files
+    QString cloudAssetId = this->m_lastUploadActionResult.id;
+    if (this->m_queuedDeletes.contains(cloudAssetId)){
+        qDebug() << "Found ID in queuedDeletes - " << cloudAssetId;
+        this->m_deletionInProgress = true;
+        Cloudinary::deleteFileById(cloudAssetId,this);
+        // @TODO pass chain along? Stop chain complete if waiting on delete? Hold off on removing from queue until sure delete succeeded?
+        this->m_queuedDeletes.removeAll(cloudAssetId);
+    }
     if (!res){
         this->setMessageOfLastResult("Download failed!");
         Uploader::getInstance()->setMessageOfLastResult("Download failed!");
@@ -330,5 +353,13 @@ bool Uploader::getActionChainInProgress(){
 void Uploader::setActionChainInProgress(bool inProgress){
     if (this->m_actionChainInProgress!=inProgress){
         this->m_actionChainInProgress = inProgress;
+        emit this->actionChainInProgressChanged();
+    }
+}
+
+void Uploader::setDeletionInProgress(bool inProgress){
+    if (this->m_deletionInProgress!=inProgress){
+        this->m_deletionInProgress = inProgress;
+        emit this->deletionInProgressChanged();
     }
 }

@@ -14,7 +14,7 @@ Downloader *Downloader::getInstance(){
     return m_instance;
 }
 
-void Downloader::downloadImageFileToPathWithSlotString(QString remotePath, QString localPath, QObject *receiver, QString slot){
+void Downloader::downloadImageFileToPathWithSlotString(QString remotePath, QString localPath,QString id, QObject *receiver, QString slot){
     qDebug() << "Downloader function called with receiver and slot";
     QNetworkAccessManager *netManager = new QNetworkAccessManager();
     QNetworkRequest request(remotePath);
@@ -51,6 +51,6 @@ void Downloader::downloadImageFileToPathWithSlotString(QString remotePath, QStri
     netManager->get(request);
 }
 
-void Downloader::downloadImageFileToPath(QString remotePath,QString localPath){
-    Downloader::downloadImageFileToPathWithSlotString(remotePath,localPath,nullptr,"");
+void Downloader::downloadImageFileToPath(QString remotePath,QString localPath,QString id){
+    Downloader::downloadImageFileToPathWithSlotString(remotePath,localPath,id,nullptr,"");
 }

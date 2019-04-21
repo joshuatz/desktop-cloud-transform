@@ -88,7 +88,7 @@ void Cloudinary::uploadFileByParamsWUploaderInstance(QMap<QString, QVariant> par
             QString filename = QFileInfo(filePath).fileName();
             // Note - image form part needs "filename" attribute on content-disposition, and then the image mime type on Content-Type header
             imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"" + filename + "\""));
-            imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(mimeDb.mimeTypeForFile(filePath).name()));
+            imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(mimeDb.mimeTypeForFile(filePath,QMimeDatabase::MatchContent).name()));
             file->open(QIODevice::ReadOnly);
             imagePart.setBodyDevice(file);
             file->setParent(multiPart);
@@ -164,6 +164,10 @@ QString Cloudinary::getPublicUploadUrlBase(){
     return "https://res.cloudinary.com/" + GlobalSettings::getInstance()->getCloudinaryCloudName() + "/image/upload";
 }
 
+QString Cloudinary::getFetchEndpoint(){
+    return "https://res.cloudinary.com/" + GlobalSettings::getInstance()->getCloudinaryCloudName() + "/image/fetch";
+}
+
 QString Cloudinary::generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config){
     // Construct the base URL
     QString publicUrl = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase());
@@ -202,7 +206,37 @@ void Cloudinary::getUsageInfoJson(void(*fnPtr)(QJsonObject res)){
             QString data = reply->readAll();
             QJsonObject jsonResult = QJsonObject(QJsonDocument::fromJson(data.toUtf8()).object());
             fnPtr(jsonResult);
+            reply->deleteLater();
         });
         QNetworkReply *reply = netManager->get(request);
     }
+}
+
+void Cloudinary::deleteFileById(QString id, Uploader *uploaderInstance){
+    QString endpoint = Cloudinary::getDeleteByPublicIdsEndpoint(QList<QString>({id}));
+    QNetworkAccessManager *netManager = new QNetworkAccessManager();
+    QNetworkRequest request(endpoint);
+    qDebug() << endpoint;
+    request.setRawHeader("Authorization",Cloudinary::getBasicAuthHeaderString().toLocal8Bit());
+    QObject::connect(netManager,&QNetworkAccessManager::finished,[uploaderInstance](QNetworkReply *reply){
+        QString data = reply->readAll();
+        QJsonObject jsonResult = QJsonObject(QJsonDocument::fromJson(data.toUtf8()).object());
+        qDebug() << jsonResult;
+        uploaderInstance->setDeletionInProgress(false);
+        reply->deleteLater();
+    });
+    QNetworkReply *reply = netManager->deleteResource(request);
+}
+
+QString Cloudinary::getDeleteByPublicIdsEndpoint(QList<QString> publicIds){
+    QString deleteUrl = "";
+    if (publicIds.length() > 0){
+        QString base = Helpers::forceEndingSlash(Cloudinary::getAdminBaseEndpoint());
+        deleteUrl = base + "resources/image/upload?";
+        for (int i = 0; i < publicIds.length(); ++i){
+            deleteUrl += (i > 0 ? "&" : "");
+            deleteUrl += "public_ids[]=" + publicIds.at(i);
+        }
+    }
+    return deleteUrl;
 }

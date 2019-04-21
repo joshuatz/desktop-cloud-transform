@@ -47,10 +47,13 @@ public:
     static QString generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config);
     typedef QMap<QString,QVariant> cloudinaryParams;
     static QString getPublicUploadUrlBase();
+    static void deleteFileById(QString id,Uploader *uploaderInstance);
 private:
     static QString getUploadEndpoint(QString resourceType);
     static QString getAdminBaseEndpoint();
     static QString getBasicAuthHeaderString();
+    static QString getFetchEndpoint();
+    static QString getDeleteByPublicIdsEndpoint(QList<QString> publicIds);
 };
 
 #endif // CLOUDINARY_H

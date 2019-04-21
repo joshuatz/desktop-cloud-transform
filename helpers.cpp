@@ -4,6 +4,7 @@
 #include <QImageReader>
 #include <QtNetwork>
 #include <QGuiApplication>
+#include <QByteArray>
 #include <QClipboard>
 
 Helpers::Helpers(QObject *parent) : QObject(parent)
@@ -37,6 +38,30 @@ bool Helpers::checkValidImageFilePath(QString imagePath){
     if (reader.canRead()){
         return true;
     }
+    // Note: reader.canRead will return false even if valid image, if detected Mime (via magic bytes) does not match extension (e.g. .png)
+    QFile file(imagePath);
+    // test if file is readable - you need to actually open file to check this
+    file.open(QIODevice::ReadOnly);
+    qDebug() << "file.isReadable()" << file.isReadable();
+    if (file.isReadable()){
+        // Make sure mime type is valid image
+        QList<QByteArray> supportedImageMimeTypes = QImageReader::supportedMimeTypes();
+        QMimeDatabase mimeDb;
+        QMimeType fileContentMimeType = mimeDb.mimeTypeForFile(imagePath,QMimeDatabase::MatchContent);
+        if (supportedImageMimeTypes.contains(QByteArray(fileContentMimeType.name().toLocal8Bit()))){
+            file.close();
+            return true;
+        }
+        // Also check the aliases of the primary mime type
+        QStringList fileContentMimeTypeAliases = fileContentMimeType.aliases();
+        for (int i=0; i<fileContentMimeTypeAliases.length(); ++i){
+            if (supportedImageMimeTypes.contains(QByteArray(fileContentMimeTypeAliases.at(i).toLocal8Bit()))){
+                file.close();
+                return true;
+            }
+        }
+    }
+    file.close();
     return false;
 }
 

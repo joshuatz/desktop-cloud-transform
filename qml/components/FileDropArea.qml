@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
 import "."
+import "../animated"
 
 Item {
     id: root
@@ -52,7 +53,7 @@ Item {
             else {
                 // @TODO popup message / nice toast
                 console.log("Non image dropped into droparea");
-                globalToastManager.show("Non image dropped into droparea");
+                root.globalToastManager.show("Non image dropped into droparea");
             }
         }
     })
