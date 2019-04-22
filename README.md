@@ -56,8 +56,8 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Cleanup QNetworkReply instances - use deleteLater to free up (probs in slot?)
  - Timeout for auto-close of success modal needs to be auto-cancelled if clicked on
      - For right now, just removed auto-close entirely
- - DB migrations (for install or upgrade)
 ## Backlog / Should implement
+ - DB migrations for upgrades to app
  - Refactor naming of classes, objects, methods - distinction between transformations and configs
  - Tag items uploaded through this tool to make easier to find online
      - https://cloudinary.com/documentation/image_upload_api_reference#tags_method

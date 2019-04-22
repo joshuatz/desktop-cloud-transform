@@ -29,7 +29,8 @@ SOURCES += \
 HEADERS += \
     helpers.h \
     database.h \
-    globalsettings.h
+    globalsettings.h \
+    lib/mousaviexecutesqlfile.h
 
 RESOURCES += qml.qrc
 

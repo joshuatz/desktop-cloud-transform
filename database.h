@@ -14,34 +14,23 @@ public:
     #else
     QString DB_PATH = "dct.db";
     #endif
-    static QSqlDatabase db;
+    static QSqlDatabase getDb();
     static bool connected;
     static Database* getInstance();
     Database(){
-        this->connected = false;
         this->connect();
     }
     ~Database(){
         if (connected){
-            Database::db.close();
+            this->getDb().close();
         }
 
     }
 private:
-    bool connect(){
-        bool connectionEstablished = false;
-        QSqlDatabase dbSetup = QSqlDatabase::addDatabase("QSQLITE");
-        dbSetup.setDatabaseName(this->DB_PATH);
-        connectionEstablished = dbSetup.open();
-        Database::db = dbSetup;
-        this->connected = connectionEstablished;
-        if (connectionEstablished){
-            // Set options - must be done after open
-            Database::db.exec("PRAGMA foreign_keys = ON;");
-        }
-        return connectionEstablished;
-    }
+    bool connect();
+    void createTables();
     static Database *m_instance;
+    static QString m_createTablesSqlFilePath;
 };
 
 #endif // DATABASE_H

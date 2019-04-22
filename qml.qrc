@@ -24,5 +24,6 @@
         <file>qml/components/AboutPage.qml</file>
         <file>assets/baseline-link-24px.svg</file>
         <file>assets/AttributionsAndLicenses.txt</file>
+        <file>db/create_tables.sql</file>
     </qresource>
 </RCC>
