@@ -1,3 +1,20 @@
+# Desktop Cloud Transform (DCT)
+## What is this?
+Desktop Cloud Transform (DCT) is a desktop GUI application written with QT/C++ that allows you to upload image files, and optionally apply advanced transformations on "the cloud", which are then downloaded back to your computer.
+
+The benefit is that you can apply extremely complicated combinations of **automated** transformations and effects on the cloud instead of your computer, which means you don't need to have Photoshop installed, or deal with complex scripting.
+
+This Git readme file is really meant to cover the technical parts of the application and how to use, rather than purpose, so for more info on the purpose and uses for this project, be sure to check out my project page [here](INSERT LINK).
+
+
+# Building
+ - So far I've only built for Windows, but there shouldn't be any Win specific dependencies in use. On my todo list is to build for Linux and OSX and see if there are any issues with the file read/writes
+ - Compile tested with MSVC and MinGW
+ - Steps should be as easy as:
+     1. Clone repo
+     2. Open in QT Creator
+     3. Build Release
+
 # Notes to self:
 ## Stats logging
 ### Syntax:
