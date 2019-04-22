@@ -167,8 +167,6 @@ Item {
     }
 
     Component.onCompleted: {
-//        root.uploadResult = Uploader.mockUploadResult("withConfig");
-//        root.uploadResult = Uploader.mockUploadResult("withConfigSaveLocal");
         root.resetModal();
     }
 
@@ -204,13 +202,10 @@ Item {
     }
 
     property var resetModal: (function(){
+        var suppressUrlField = false;
         imagePreviewAreaLoader.visible = false;
         stringCopyFields.clear();
         stringCopyFields.append([
-            {
-                "fieldName" : "URL",
-                "fieldVal" : uploadResult.url
-            },
             {
                 "fieldName" : "id",
                 "fieldVal" : uploadResult.id
@@ -227,12 +222,23 @@ Item {
                     }
                 ]);
             }
+            if (root.attachedConfig.deleteCloudCopyAfterDownload){
+                suppressUrlField = true;
+            }
             else {
                 imageToDisplayPath = root.uploadResult.url;
             }
             imagePreviewAreaLoader.visible = true;
             imagePreviewAreaLoader.imagePath = imageToDisplayPath;
             imagePreviewAreaLoader.sourceComponent = inlinePreviewImageComponent;
+        }
+        if (suppressUrlField === false){
+            stringCopyFields.append([
+                {
+                    "fieldName" : "URL",
+                    "fieldVal" : uploadResult.url
+                }
+            ]);
         }
     })
 }
