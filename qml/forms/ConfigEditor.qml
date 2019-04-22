@@ -222,16 +222,17 @@ Item {
                             }
                             CheckBox {
                                 id: usesOutgoingRawTransCheckbox
-                                text: qsTr("Uses an OUTGOING Raw Transformation String")
+                                text: qsTr("Uses an OUTGOING Transformation String")
                                 onCheckStateChanged: {
                                     root.comboValidator();
                                 }
                             }
                             TextField {
                                 id: outgoingRawTransInput
-                                width: (parent.width - rawTransHelpButton.width - usesRawTransCheckbox.width) * 0.85
+                                width: (parent.width - outgoingRawTransHelpButton.width - usesOutgoingRawTransCheckbox.width) * 0.85
                                 placeholderText: "Raw Transformation String"
                                 visible: usesOutgoingRawTransCheckbox.checked
+                                selectByMouse: true
                             }
                         }
                         Row {

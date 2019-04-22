@@ -18,6 +18,7 @@ Item {
             id: mainListView
             anchors.fill: parent
             model: root.configList
+            clip: true
             delegate: Component {
                 Item {
                     id: configDelegate
