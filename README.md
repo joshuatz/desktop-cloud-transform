@@ -10,8 +10,14 @@ The benefit is that you can apply extremely complicated combinations of **automa
 
 This Git readme file is really meant to cover the technical parts of the application and how to use, rather than purpose, so for more info on the purpose and uses for this project, be sure to check out my project page [here](https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/).
 
+## Disclaimers:
+First, this was built mainly for myself, most over the course of a week, and as a way to get up to speed on some QT/C++ stuff. Please don't view it as production-level quality code.
+
+Also, although DCT makes extensive use of Cloudinary and its API, it is not affiliated with Cloudinary in any official capacity. I am not responsible for how you use their services, and it is up to you as a user to know their TOS and be responsible with your usage of their services while using my application.
+
 # Macro support
 Macros are case-insensitive; I'm using camelcase below just to make it easier to read. Macros should always be enclosed in braces, with no spaces. Certain transformations are only supported on "outgoing transformations", which are transformations that are applied **after** an image has been uploaded.
+
 Macro | Incoming Transformation | Outgoing Transformation | What it does
 --- | --- | --- | ---
 {uploaded} | No | Yes | Inserts public ID as overlay - "l_PUBLICID"
