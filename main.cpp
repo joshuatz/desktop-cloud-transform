@@ -13,6 +13,10 @@
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QGuiApplication app(argc, argv);
+    QQmlApplicationEngine engine;
+
     // Establish SQLite - this should create the .db file if it does not exist
     Database db = Database();
 
@@ -22,10 +26,6 @@ int main(int argc, char *argv[])
     TransformationList::getInstance()->loadAllFromStorage();
     // Load stats
     Stats::getInstance()->forceRefreshFromDb();
-
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QGuiApplication app(argc, argv);
-    QQmlApplicationEngine engine;
 
     // Set Material theme for QTQuickControls
     QQuickStyle::setStyle("Material");
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     Stats::getInstance()->logStat("application","startup",false);
     Stats::getInstance()->fireGaEvent("application","startup","",NULL);
 
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
 

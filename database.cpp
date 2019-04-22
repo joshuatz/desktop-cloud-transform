@@ -28,20 +28,30 @@ QSqlDatabase Database::getDb(){
 bool Database::connect(){
     if (this->connected==false){
         // check if the DB file at least exists
-        bool dbFileExists = QFile::exists(this->DB_PATH);
         bool connectionEstablished = false;
         QSqlDatabase dbSetup = QSqlDatabase::addDatabase("QSQLITE");
         dbSetup.setDatabaseName(this->DB_PATH);
-        // NOTE - calling QSqlDatabase.open on a Sqlite path that does not exist yet, will actually create a new DB file at that path
+        // NOTE - calling QSqlDatabase.open on a Sqlite path that does not exist yet, will (or should) actually create a new DB file at that path
         connectionEstablished = dbSetup.open();
+        if (!connectionEstablished){
+            // Hmmm. calling db open should have created file, but maybe it didn't.
+            if (!QFile::exists(this->DB_PATH)){
+                // This should create file if it does not exist
+                QFile dbFile(this->DB_PATH);
+                dbFile.open(QIODevice::WriteOnly);
+                dbFile.close();
+                // Try again
+                connectionEstablished = dbSetup.open();
+            }
+        }
         this->connected = connectionEstablished;
         if (connectionEstablished){
             // Set options - must be done after open
             dbSetup.exec("PRAGMA foreign_keys = ON;");
-        }
-        if (dbSetup.tables(QSql::Tables).contains(GlobalSettings::TABLE_NAME) == false){
-            // This must be a blank new DB, so we need to set up the empty tables for the app
-            this->createTables();
+            if (dbSetup.tables(QSql::Tables).contains(GlobalSettings::TABLE_NAME) == false){
+                // This must be a blank new DB, so we need to set up the empty tables for the app
+                this->createTables();
+            }
         }
         return connectionEstablished;
     }

@@ -3,10 +3,10 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.3
 import QtQuick.Controls.impl 2.0
-import "./qml/animated"
-import "./qml/components"
-import "./qml/forms"
-import "./qml"
+import "./animated"
+import "./components"
+import "./forms"
+import "."
 
 ApplicationWindow {
     id: root

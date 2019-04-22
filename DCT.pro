@@ -1,7 +1,12 @@
-QT += qml quick
+QT += qml
+QT += quick
 QT += quickcontrols2
 QT += sql
+CONFIG += console
 CONFIG += c++11
+CONFIG += qtquickcompiler
+
+QT_DEBUG_PLUGINS=1
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -36,7 +41,8 @@ include("apis/apis.pri")
 include("lib/qt-google-analytics/qt-google-analytics.pri")
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
+# I shouldn't have to do this...
+QML_IMPORT_PATH = C:\Qt\5.12.1\mingw73_64\qml
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_DESIGNER_IMPORT_PATH =
@@ -53,7 +59,7 @@ RC_ICONS = transform_352180.ico
 debug {
     CONFIG += qml_debug
 }
-!debug {
-    DEFINES += QT_NO_DEBUG_OUTPUT
+else {
+#    DEFINES += QT_NO_DEBUG_OUTPUT
 }
 
