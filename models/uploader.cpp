@@ -71,7 +71,7 @@ QString Uploader::macroReplacer(QString inputString, QString localImageFilePath,
         replacerMap.insert("{filename}",fileInfo.fileName());
         replacerMap.insert("{filenameNoExt}",fileInfo.baseName());
         replacerMap.insert("{basename}",fileInfo.baseName());
-        replacerMap.insert("{created_epochs}",QString::number(fileInfo.birthTime().toSecsSinceEpoch()));
+        replacerMap.insert("{createdStamp}",QString::number(fileInfo.birthTime().toSecsSinceEpoch()));
     }
 
     // Account details
@@ -122,7 +122,9 @@ void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationCo
             params.insert("transformation",QVariant(transString));
         }
         else if (config.usesTransformationRawString){
-            params.insert("transformation",QVariant(config.transformationRawString));
+            // Run trans string through macro replacer
+            QString rawTransString = Uploader::macroReplacer(config.transformationRawString,localImageFilePath,QMap<QString,QString>());
+            params.insert("transformation",QVariant(rawTransString));
         }
         Cloudinary::uploadFileByParamsWUploaderInstance(params,uploaderInstance);
     }
@@ -317,10 +319,12 @@ void Uploader::receiveDownloadResultSlot(bool res){
         Uploader::getInstance()->setMessageOfLastResult("Download failed!");
     }
     if(this->getActionChainInProgress()){
-        // finish out chain and emit event
-        this->setActionChainInProgress(false);
-        emit Uploader::getInstance()->uploadActionResultReceived();
-        qDebug() << "Action chain was finished out in receiveDownloadResultSlot";
+        // finish out chain and emit event - use tiny delay to avoid trying to read image file at exact same time download writer is closing out connection
+        QTimer::singleShot(100,[this](){
+            this->setActionChainInProgress(false);
+            emit Uploader::getInstance()->uploadActionResultReceived();
+            qDebug() << "Action chain was finished out in receiveDownloadResultSlot";
+        });
     }
     // Regardless of success, set downloading flag to false
     this->setDownloadInProgress(false);

@@ -10,6 +10,18 @@ The benefit is that you can apply extremely complicated combinations of **automa
 
 This Git readme file is really meant to cover the technical parts of the application and how to use, rather than purpose, so for more info on the purpose and uses for this project, be sure to check out my project page [here](https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/).
 
+# Macro support
+Macros are case-insensitive; I'm using camelcase below just to make it easier to read. Macros should always be enclosed in braces, with no spaces. Certain transformations are only supported on "outgoing transformations", which are transformations that are applied **after** an image has been uploaded.
+Macro | Incoming Transformation | Outgoing Transformation | What it does
+--- | --- | --- | ---
+{uploaded} | No | Yes | Inserts public ID as overlay - "l_PUBLICID"
+{width} | Yes | Yes | Inserts width in pixels of local file being uploaded
+{height} | Yes | Yes | Inserts height in pixels of local file being uploaded
+{filename} | Yes | Yes | Inserts the filename *including* the extension
+{filenameNoExt} or {basename} | Yes | Yes | Inserts the filename *without* the extension
+{createdStamp} | Yes | Yes | Inserts the timestamp of when the uploaded file was created, in secs since epoch
+{cloudinaryCloudName} | Yes | Yes | Inserts *your* cloudinary cloud name / id
+{timestamp} | Yes | Yes | Inserts the current time, as secs since epoch
 
 # Building
  - So far I've only built for Windows, but there shouldn't be any Win specific dependencies in use. On my todo list is to build for Linux and OSX and see if there are any issues with the file read/writes
@@ -52,13 +64,7 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Incoming transformations on upload - https://cloudinary.com/documentation/upload_images#incoming_transformations
 # TODOS
 ## !! - High priority - !!
- - Looks like QT is filelocking the image when I display it in the success modal - maybe I can clone it to a temp directory or into memory?
-     - Not sure there is going to be an easy solution to this. I think this coming from using QImage (Image{} QML) natively.
-         - Idea A) Copy downloaded file to temp dir (same as install or use some QT-get-sysdir type call). Delete after success modal closed, or on timer loop (or on app close or open)
-         - Idea B) See if can use JS-in-QML to do something like copy image to canvas, or some other element that might force it into memory vs accessing off disk
-         - Idea C) When downloading for user, read into memory as native QPixMap or something like that. Then send to QML layer as a pseudo image (not a resource URL)
- - Cleanup QNetworkReply instances - use deleteLater to free up (probs in slot?)
- - Timeout for auto-close of success modal needs to be auto-cancelled if clicked on
+ - ~~Timeout for auto-close of success modal needs to be auto-cancelled if clicked on~~
      - For right now, just removed auto-close entirely
 ## Backlog / Should implement
  - DB migrations for upgrades to app

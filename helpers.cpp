@@ -25,6 +25,7 @@ void Helpers::checkInternetConnection(bool *res){
         else {
             *res = true;
         }
+        reply->deleteLater();
     });
 
     // Start the network request
