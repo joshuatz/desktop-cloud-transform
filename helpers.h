@@ -18,6 +18,7 @@ public slots:
     static QString formatFilePathForQml(QString filePath);
     static QString forceEndingSlash(QString input);
     static QString removeBeginSlash(QString input);
+    static bool getIsDebug();
 private:
 };
 

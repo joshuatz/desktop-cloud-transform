@@ -104,3 +104,11 @@ QString Helpers::removeBeginSlash(QString input){
     }
     return output;
 }
+
+bool Helpers::getIsDebug(){
+#ifdef QT_DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
