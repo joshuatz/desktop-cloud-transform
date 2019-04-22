@@ -282,6 +282,9 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
         emit Uploader::getInstance()->uploadActionResultReceived();
         qDebug() << "Action chain was finished out in receiveNetworkReply";
     }
+
+    // Make sure to delete reply. For file upload (multi-part form POST), the file is read as it is sent and the "parent" is the reply, so the file can't be freed until you free the reply. If you don't free and upload fails, causes a file lock!
+    reply->deleteLater();
 }
 
 void Uploader::setUploadInProgress(bool uploadInProgressStatus){

@@ -129,9 +129,7 @@ void Cloudinary::uploadFileByParamsWUploaderInstance(QMap<QString, QVariant> par
 //    });
 
     QNetworkReply *reply = netManager->post(request, multiPart);
-
-    qDebug() << reply;
-    //multiPart->setParent(reply); // delete the multiPart with the reply
+    multiPart->setParent(reply); // delete the multiPart with the reply
 }
 
 void Cloudinary::uploadRemoteFileByUrl(QString publicImageUrl){
