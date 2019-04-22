@@ -6,6 +6,8 @@ Desktop Cloud Transform (DCT) is a desktop GUI application written with QT/C++ t
 
 The benefit is that you can apply extremely complicated combinations of **automated** transformations and effects on the cloud instead of your computer, which means you don't need to have Photoshop installed, or deal with complex scripting.
 
+![Demo GIF](https://github.com/joshuatz/desktop-cloud-transform/raw/master/readme-files/Desktop%20Cloud%20Transform%20(DCT)%20-%20Dog%20Demo.gif "Using various saved configurations")
+
 This Git readme file is really meant to cover the technical parts of the application and how to use, rather than purpose, so for more info on the purpose and uses for this project, be sure to check out my project page [here](https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/).
 
 
