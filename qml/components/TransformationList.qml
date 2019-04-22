@@ -104,13 +104,6 @@ Item {
             }
         }
     }
-    onConfigListChanged: {
-//        console.log(JSON.stringify(root.configList));
-        //mainListView.
-    }
-    Component.onCompleted: {
-//        console.log(JSON.stringify(root.configList));
-    }
 
     // Hidden - file picker for image
     ImageFilePicker {

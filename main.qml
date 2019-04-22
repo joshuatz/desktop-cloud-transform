@@ -254,10 +254,6 @@ ApplicationWindow {
                 uploadSuccessModal.uploadResult = root.lastUploadResult;
                 uploadSuccessModal.contentItem.resetModal();
                 uploadSuccessModal.open();
-                delay(5000,function(){
-//                   uploadSuccessModal.close();
-                });
-
             }
             else {
                 // @TODO replace with animated toast

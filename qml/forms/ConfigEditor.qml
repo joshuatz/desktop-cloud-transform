@@ -92,12 +92,6 @@ Item {
                             id: localSaveOptionsSection
                             width: parent.width * 0.90
                             visible: saveLocallyCheckbox.checked
-                            onVisibleChanged: {
-                                console.log("localSaveOptionsSection visible = " + visible)
-                            }
-                            onHeightChanged: {
-                                console.log(localSaveOptionsSection.height)
-                            }
                             property real computedHeight: overwriteLocalOptionRow.height + overwriteWarning.height + heightPadding
                             property real heightPadding: 8
                             height: localSaveOptionsSection.visible ? localSaveOptionsSection.computedHeight : 0
@@ -129,7 +123,7 @@ Item {
                                         id: createdFileSuffixInput
                                         width: (parent.width - overwriteLocalFileCheckbox.width) * 0.8
                                         placeholderText: qsTr("Suffix for created file")
-                                        visible: overwriteLocalFileCheckbox.checked == false
+                                        visible: overwriteLocalFileCheckbox.checked === false
                                     }
                                 }
                                 Row {

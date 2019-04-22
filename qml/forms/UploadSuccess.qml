@@ -154,11 +154,6 @@ Item {
                                     }
                                 }
                             }
-
-                            Component.onCompleted: {
-                                console.log(parent.height)
-                                console.log(parent.width)
-                            }
                         }
                     }
                 }
