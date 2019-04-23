@@ -1,10 +1,8 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.3
-import QtQuick.Controls.Material 2.3
-import "../"
-
+import QtQuick.Controls 2.12
+import QtQuick.Controls.Material 2.12
 import QtQuick.Dialogs 1.2
-
+import "../"
 Item {
     id: root
     anchors.fill: parent

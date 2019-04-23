@@ -19,12 +19,12 @@ signals:
     void statsUpdated();
 public slots:
     void forceRefreshFromDb();
-    static void fireGaEvent(QString category, QString action, QString label, QVariant value);
+    static void fireGaEvent(QString category, QString action, QString label, QVariant value = QVariant());
     /**
      * @brief logStat - logStat and logStatWithConfig both log internally - by saving to DB.
      */
     static int logStat(QString category, QString action, bool usedCloudinary);
-    static int logStatWithConfig(QString category,QString action,bool usedCloudinary,bool usedConfig,int configId);
+    static int logStatWithConfig(QString category,QString action,bool usedCloudinary,bool usedConfig = false,int configId = -1);
 private:
     static Stats *m_instance;
     static const QString TABLENAME;

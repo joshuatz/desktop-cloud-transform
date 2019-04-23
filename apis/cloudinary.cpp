@@ -206,7 +206,7 @@ void Cloudinary::getUsageInfoJson(void(*fnPtr)(QJsonObject res)){
             fnPtr(jsonResult);
             reply->deleteLater();
         });
-        QNetworkReply *reply = netManager->get(request);
+        netManager->get(request);
     }
 }
 
@@ -223,7 +223,7 @@ void Cloudinary::deleteFileById(QString id, Uploader *uploaderInstance){
         uploaderInstance->setDeletionInProgress(false);
         reply->deleteLater();
     });
-    QNetworkReply *reply = netManager->deleteResource(request);
+    netManager->deleteResource(request);
 }
 
 QString Cloudinary::getDeleteByPublicIdsEndpoint(QList<QString> publicIds){

@@ -45,7 +45,7 @@ void Stats::forceRefreshFromDb(){
 }
 
 int Stats::logStat(QString category, QString action, bool usedCloudinary){
-    return logStatWithConfig(category,action,usedCloudinary,false,NULL);
+    return logStatWithConfig(category,action,usedCloudinary,false);
 }
 
 int Stats::logStatWithConfig(QString category, QString action, bool usedCloudinary, bool usedConfig, int configId){
@@ -82,9 +82,6 @@ int Stats::logStatWithConfig(QString category, QString action, bool usedCloudina
 
 void Stats::fireGaEvent(QString category, QString action, QString label, QVariant value){
     #ifdef GAUID
-        if (value==NULL){
-            value = QVariant();
-        }
         if(GlobalSettings::getInstance()->getIsOptedOutTracking()==false){
             Stats::getInstance()->getGaTracker()->sendEvent(category,action,label,value);
         }

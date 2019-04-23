@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 // https://gist.github.com/jonmcclung/bae669101d17b103e94790341301c129
 /**
   * adapted from StackOverflow:

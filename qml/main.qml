@@ -1,8 +1,6 @@
 import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.3
-import QtQuick.Controls.Material 2.3
-import QtQuick.Controls.impl 2.0
+import QtQuick.Controls 2.12
+import QtQuick.Controls.Material 2.12
 import "./animated"
 import "./components"
 import "./forms"
@@ -186,14 +184,14 @@ ApplicationWindow {
                     height: parent.height
                     color: Qt.rgba(mainProgressBar.Material.accentColor.r, mainProgressBar.Material.accentColor.g, mainProgressBar.Material.accentColor.b, 0.25)
                 }
-                contentItem: ProgressBarImpl {
+                contentItem: ProgressBar {
                     implicitWidth: 200
                     width: mainProgressBarModal.width
                     implicitHeight: 80
                     indeterminate: mainProgressBarModal.indeterminate
-                    progress: mainProgressBar.position
+//                    progress: mainProgressBar.position
                     scale: mainProgressBar.mirrored ? -1 : 1
-                    color: mainProgressBar.Material.accentColor
+//                    color: mainProgressBar.Material.accentColor
                 }
             }
         }

@@ -13,7 +13,18 @@
 
 int main(int argc, char *argv[])
 {
+    if (Helpers::getIsDebug()){
+        qputenv("QT_DEBUG_PLUGINS", QByteArray("1"));
+    }
+    QCoreApplication::addLibraryPath("./");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    // Register settings config
+    QCoreApplication::setOrganizationName("JoshuaTzucker");
+    QCoreApplication::setOrganizationDomain("joshuatz.com");
+    QCoreApplication::setApplicationName("Desktop Cloud Transform");
+    QCoreApplication::setApplicationVersion("0.0.1");
+
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
@@ -42,12 +53,6 @@ int main(int argc, char *argv[])
     // Register metatypes
     qRegisterMetaType<UploadActionResult>();
     qRegisterMetaType<TransformationConfig>();
-
-    // Register settings config
-    QCoreApplication::setOrganizationName("JoshuaTzucker");
-    QCoreApplication::setOrganizationDomain("joshuatz.com");
-    QCoreApplication::setApplicationName("Desktop Cloud Transform");
-    QCoreApplication::setApplicationVersion("0.0.1");
 
     // Log startup :)
     Stats::getInstance()->logStat("application","startup",false);
