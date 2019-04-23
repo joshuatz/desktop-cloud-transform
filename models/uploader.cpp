@@ -124,6 +124,7 @@ void Uploader::uploadImageWithConfig(QString localImageFilePath,TransformationCo
         else if (config.usesTransformationRawString){
             // Run trans string through macro replacer
             QString rawTransString = Uploader::macroReplacer(config.transformationRawString,localImageFilePath,QMap<QString,QString>());
+            rawTransString = Cloudinary::autoEscapeTransString(rawTransString);
             params.insert("transformation",QVariant(rawTransString));
         }
         Cloudinary::uploadFileByParamsWUploaderInstance(params,uploaderInstance);
@@ -219,6 +220,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                     QString finalOutgoingTransString = config.outoingTransformationRawString.replace("{uploaded}",uploadImageMacroVal,Qt::CaseSensitivity::CaseInsensitive);
                     // Final macro replacements
                     finalOutgoingTransString = Uploader::macroReplacer(finalOutgoingTransString,this->m_localFilePath,QMap<QString,QString>());
+                    finalOutgoingTransString = Cloudinary::autoEscapeTransString(finalOutgoingTransString);
                     // Set the final fetch url to the cloudinary upload base URL + computed trans string, and count as ANOTHER trans credit use
                     Stats::getInstance()->logStat("cloudinary","transform",true);
                     // Check to see if user specified their own download URL instead of just a trans string
@@ -226,7 +228,29 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                         finalImageUrlToDownload = finalOutgoingTransString;
                     }
                     else {
-                        finalImageUrlToDownload = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase()) + Helpers::removeBeginSlash(finalOutgoingTransString);
+                        // Careful! If final URL to download ends with a URL, we should use the /fetch base, but if it ends in a Cloudinary public ID, we can use the normal /upload base
+                        if (finalOutgoingTransString.contains(QRegularExpression("^.+(l_fetch:[^\\/]+)$|^.+(http.+)$",QRegularExpression::CaseInsensitiveOption))){
+                            QRegularExpression endsWithFetchReg("^.+l_fetch:([^\\/]+)$",QRegularExpression::CaseInsensitiveOption);
+                            QRegularExpressionMatch endsWithFetchRegMatch(endsWithFetchReg.match(finalOutgoingTransString));
+                            // If use ended trans in l_fetch:..., un-base64 and just use regular http string
+                            if (endsWithFetchRegMatch.hasMatch()){
+                                try {
+                                    QString rawUrl = endsWithFetchRegMatch.captured(1);
+                                    QString unbase64edUrl = QByteArray::fromBase64(rawUrl.toUtf8());
+                                    qDebug() << "Base64 decoded from " << rawUrl << " to " << unbase64edUrl;
+                                    // replace .../L_fetch:base64^ with .../url^
+                                    finalOutgoingTransString.replace(("l_fetch:"+rawUrl),unbase64edUrl);
+                                } catch (...) {
+                                    if (Helpers::getIsDebug()){
+                                        qDebug() << "Error trying to base64 decode l_fetch ending";
+                                    }
+                                }
+                            }
+                            finalImageUrlToDownload = Helpers::forceEndingSlash(Cloudinary::getFetchEndpoint()) + Helpers::removeBeginSlash(finalOutgoingTransString);
+                        }
+                        else {
+                            finalImageUrlToDownload = Helpers::forceEndingSlash(Cloudinary::getPublicUploadUrlBase()) + Helpers::removeBeginSlash(finalOutgoingTransString);
+                        }
                     }
                     result.url = finalImageUrlToDownload;
                 }

@@ -47,12 +47,14 @@ public:
     static QString generateImageUrlFromConfigAndId(QString uploadedPublicId, TransformationConfig config);
     typedef QMap<QString,QVariant> cloudinaryParams;
     static QString getPublicUploadUrlBase();
+    static QString getFetchEndpoint();
     static void deleteFileById(QString id,Uploader *uploaderInstance);
+    static QString doubleEscapeTextLayerString(QString text);
+    static QString autoEscapeTransString(QString text);
 private:
     static QString getUploadEndpoint(QString resourceType);
     static QString getAdminBaseEndpoint();
     static QString getBasicAuthHeaderString();
-    static QString getFetchEndpoint();
     static QString getDeleteByPublicIdsEndpoint(QList<QString> publicIds);
 };
 

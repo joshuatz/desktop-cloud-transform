@@ -238,3 +238,30 @@ QString Cloudinary::getDeleteByPublicIdsEndpoint(QList<QString> publicIds){
     }
     return deleteUrl;
 }
+
+QString Cloudinary::doubleEscapeTextLayerString(QString text){
+    // See https://support.cloudinary.com/hc/en-us/articles/202521512-How-to-add-a-slash-character-or-any-other-special-characters-in-text-overlays-
+    // Double escape is the same as JS encodeURIComponent(encodeURIComponent(string))
+    QString output = text;
+    // "/"
+    output = output.replace(QRegularExpression("\\/"),"%252F");
+    // "\"
+    output = output.replace(QRegularExpression("\\\\"),"%255C");
+    // ","
+    output = output.replace(QRegularExpression(","),"%252C");
+    return output;
+}
+
+QString Cloudinary::autoEscapeTransString(QString text){
+    QString output = text;
+    // Escape text layers
+    QRegularExpression textLayers("(l_text:[^,\\/]+)");
+    QRegularExpressionMatchIterator textLayerIterator = textLayers.globalMatch(text);
+    while (textLayerIterator.hasNext()){
+        QRegularExpressionMatch match = textLayerIterator.next();
+        QString captured = match.captured(1);
+        // Replace by passing capture start & end index to string replacer
+        output.replace(match.capturedStart(0),match.capturedLength(0),Cloudinary::doubleEscapeTextLayerString(captured));
+    }
+    return output;
+}
