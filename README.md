@@ -1,6 +1,8 @@
 # Desktop Cloud Transform (DCT)
 ## Project Page
 [https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/](https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/)
+## Pre-built release
+Find under the releases tab on Github.
 ## What is this?
 Desktop Cloud Transform (DCT) is a desktop GUI application written with QT/C++ that allows you to upload image files, and optionally apply advanced transformations on "the cloud", which are then downloaded back to your computer.
 
@@ -8,14 +10,19 @@ The benefit is that you can apply extremely complicated combinations of **automa
 
 ![Demo GIF](https://github.com/joshuatz/desktop-cloud-transform/raw/master/readme-files/Desktop%20Cloud%20Transform%20(DCT)%20-%20Dog%20Demo.gif "Using various saved configurations")
 
-This Git readme file is really meant to cover the technical parts of the application and how to use, rather than purpose, so for more info on the purpose and uses for this project, be sure to check out my project page [here](https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/).
+This Git readme file is really meant to cover the technical parts of the application and how to use it, rather than purpose, so for more info on the background and uses for this project, be sure to check out my project page [here](https://joshuatz.com/projects/applications/desktop-cloud-transform-dct/).
 
-## Disclaimers:
+# Disclaimers:
 First, this was built mainly for myself, most over the course of a week, and as a way to get up to speed on some QT/C++ stuff. Please don't view it as production-level quality code.
 
 Also, although DCT makes extensive use of Cloudinary and its API, it is not affiliated with Cloudinary in any official capacity. I am not responsible for how you use their services, and it is up to you as a user to know their TOS and be responsible with your usage of their services while using my application.
 
-# Macro support
+# How to use it
+## GUI
+![Main User Interface](https://github.com/joshuatz/desktop-cloud-transform/raw/master/readme-files/Desktop%20Cloud%20Transform%20-%20GUI%20Diagram.png "Using various saved configurations")
+## What are DCT "Configurations"?
+A configuration is a set of DCT settings (such as how to save the resulting file) and Cloudinary transformation settings (such as adding overlays, modifying colors, etc.). Once you have created a configuration, you can drag and drop a file into its row to upload your image, have the config settings applied, and the resulting image file downloaded back to your hard drive. There are a few preloaded configs so you can get a feel for how they work. You can delete or modify configs at any time.
+## Macro support
 Macros are case-insensitive; I'm using camelcase below just to make it easier to read. Macros should always be enclosed in braces, with no spaces. Certain transformations are only supported on "outgoing transformations", which are transformations that are applied **after** an image has been uploaded.
 
 Macro | Incoming Transformation | Outgoing Transformation | What it does
@@ -31,7 +38,7 @@ Macro | Incoming Transformation | Outgoing Transformation | What it does
 
 # Building
  - So far I've only built for Windows, but there shouldn't be any Win specific dependencies in use. On my todo list is to build for Linux and OSX and see if there are any issues with the file read/writes
- - Compile tested with MSVC and MinGW
+ - Compile tested with MSVC. Should work with MinGW too.
  - Steps should be as easy as:
      1. Clone repo
      2. Open in QT Creator
