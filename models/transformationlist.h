@@ -34,7 +34,7 @@ public slots:
     void loadAllFromStorage();
     int saveNewToStorage(TransformationConfig newConfig);
     int insertOrUpdateInStorage(TransformationConfig config,bool isUpdate);
-    TransformationList::ConfigList getDefaults();
+    static TransformationList::ConfigList getDefaults();
     TransformationConfig getBlankTransformationConfig(){
         TransformationConfig config;
         return config;

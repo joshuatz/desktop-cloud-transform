@@ -1,6 +1,7 @@
 #include "database.h"
 #include "globalsettings.h"
 #include "lib/mousaviexecutesqlfile.h"
+#include "models/transformationlist.h"
 #include <QDebug>
 
 bool Database::connected = false;
@@ -64,8 +65,20 @@ void Database::createTables(){
         QFile sqlFile(this->m_createTablesSqlFilePath);
         QSqlDatabase db = this->getDb();
         MousaviExecuteSqlFile::executeQueryFile(sqlFile,db);
+        this->seedTables();
     }
     else {
         qDebug() << "Missing create_tables sql file";
+    }
+}
+
+void Database::seedTables(){
+    if (Database::connected){
+        // Load in default configs
+        TransformationList::ConfigList defaults = TransformationList::getDefaults();
+        TransformationList::ConfigList::iterator i;
+        for (i = defaults.begin(); i != defaults.end(); ++i){
+            TransformationList::getInstance()->saveNewToStorage(*i);
+        }
     }
 }

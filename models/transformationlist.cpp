@@ -22,10 +22,27 @@ TransformationList::TransformationList(QObject *parent) : QObject(parent)
 }
 
 TransformationList::ConfigList TransformationList::getDefaults(){
-    // @TODO
     TransformationList::ConfigList defaults;
+
     // Twitter crop
     TransformationConfig twitterConfig;
+    twitterConfig.userDefinedName = "Twitter Crop";
+    twitterConfig.createdFileSuffix = "_tweet";
+    twitterConfig.saveLocally = true;
+    twitterConfig.usesTransformationRawString = true;
+    twitterConfig.transformationRawString = "c_limit,h_588,w_1038/ar_1038:588,c_crop";
+    twitterConfig.deleteCloudCopyAfterDownload = true;
+    defaults.append(twitterConfig);
+
+    // Polaroid Template
+    TransformationConfig polaroid;
+    polaroid.userDefinedName = "Polaroid";
+    polaroid.createdFileSuffix = "_polaroid";
+    polaroid.saveLocally = true;
+    polaroid.usesTransformationRawString = false;
+    polaroid.usesOutgoingTransformationRawString = true;
+    polaroid.outoingTransformationRawString = "c_scale,h_640,w_489/e_art:sizzle,c_fill,g_auto,h_341,{uploaded},w_368/a_357,r_38,fl_layer_apply,g_north_west,x_49,y_44/l_text:Roboto_38_normal:{filenameNoExt}/a_356,b_rgb:000000,co_rgb:000000,e_colorize,fl_layer_apply,g_north_west,x_62,y_408/l_fetch:aHR0cHM6Ly9pLmltZ3VyLmNvbS9ZMWwyT1dMLnBuZw==";
+    defaults.append(polaroid);
 
     return defaults;
 }
@@ -62,7 +79,7 @@ void TransformationList::loadAllFromStorage(){
  * @return id of the inserted row, which should become this configs ID
  */
 int TransformationList::saveNewToStorage(TransformationConfig newConfig){
-    return TransformationList::insertOrUpdateInStorage(newConfig,true);
+    return TransformationList::insertOrUpdateInStorage(newConfig,false);
 }
 
 /**

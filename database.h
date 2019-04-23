@@ -29,6 +29,7 @@ public:
 private:
     bool connect();
     void createTables();
+    void seedTables();
     static Database *m_instance;
     static QString m_createTablesSqlFilePath;
 };
