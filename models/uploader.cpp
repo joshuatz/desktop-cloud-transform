@@ -164,8 +164,12 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
     if (reply->error()){
         result.success = false;
-        qDebug() << "network reply error!";
         result.messageString = "Error in response from Cloudinary";
+        qDebug() << "network reply error!";
+        qDebug() << reply->errorString();
+        if (reply->errorString().contains("TLS ",Qt::CaseInsensitive)){
+            qDebug() << "SSL build version = " << QSslSocket::sslLibraryVersionString() << " || SSL lib version = " << QSslSocket::sslLibraryVersionString();
+        }
     }
     else {
         result.success = true;
