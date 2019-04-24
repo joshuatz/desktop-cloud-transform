@@ -30,7 +30,7 @@ Item {
                 color: Qt.rgba(255/255,255/255,255/255,0.8)
                 Text {
                     anchors.centerIn: parent
-                    text: "About DCT"
+                    text: "About DCT - v" + Helpers.getVersionString()
                     color: ThemeColors.darkPrimary
                     font.pixelSize: 30
                 }

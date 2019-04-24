@@ -26,6 +26,7 @@ SOURCES += \
     globalsettings.cpp
 
 HEADERS += \
+    appinfo.h \
     helpers.h \
     database.h \
     globalsettings.h \

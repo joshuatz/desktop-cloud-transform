@@ -1,3 +1,8 @@
+/**
+* Copyright (C) 2019 Joshua Tzucker
+*/
+
+#include "appinfo.h"
 #include "apis/cloudinary.h"
 #include "database.h"
 #include "globalsettings.h"
@@ -20,10 +25,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     // Register settings config
-    QCoreApplication::setOrganizationName("JoshuaTzucker");
-    QCoreApplication::setOrganizationDomain("joshuatz.com");
-    QCoreApplication::setApplicationName("Desktop Cloud Transform");
-    QCoreApplication::setApplicationVersion("0.0.1");
+    QCoreApplication::setOrganizationName(APP_ORG_NAME);
+    QCoreApplication::setOrganizationDomain(APP_ORG_DOMAIN);
+    QCoreApplication::setApplicationName(APP_NAME);
+    QCoreApplication::setApplicationVersion(APP_VERSION_STRING);
 
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;

@@ -19,6 +19,7 @@ public slots:
     static QString forceEndingSlash(QString input);
     static QString removeBeginSlash(QString input);
     static bool getIsDebug();
+    static QString getVersionString();
 private:
 };
 

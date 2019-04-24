@@ -50,6 +50,10 @@ Macro | Incoming Transformation | Outgoing Transformation | What it does
 # Deploying
 I'm using windeployqt to pull in DLLs to bundle with my exe for release. however, it doesn't pull in OpenSSL although it is needed for the Cloudinary API calls.
 
+# License
+Licensed under Apache 2.0
+See LICENSE file for details.
+
 # Notes to self:
 ## Stats logging
 ### Syntax:

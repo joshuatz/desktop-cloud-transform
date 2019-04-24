@@ -1,3 +1,4 @@
+#include "appinfo.h"
 #include "helpers.h"
 #include <QObject>
 #include <QDebug>
@@ -112,4 +113,8 @@ bool Helpers::getIsDebug(){
 #else
     return false;
 #endif
+}
+
+QString Helpers::getVersionString(){
+    return APP_VERSION_STRING;
 }
