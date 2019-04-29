@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
+        <file>db/create_tables.sql</file>
         <file>qml/main.qml</file>
-        <file>qtquickcontrols2.conf</file>
         <file>qml/components/TopBar.qml</file>
         <file>qml/components/TransformationList.qml</file>
         <file>qml/components/BottomBar.qml</file>
@@ -13,17 +13,17 @@
         <file>qml/animated/Toast.qml</file>
         <file>qml/animated/ToastManager.qml</file>
         <file>qml/forms/UploadSuccess.qml</file>
-        <file>assets/baseline-edit-24px.svg</file>
-        <file>assets/baseline-folder_open-24px.svg</file>
-        <file>assets/iconfinder_icon-33-clipboard-add_314289_black.svg</file>
+        <file>qml/components/AboutPage.qml</file>
         <file>qml/components/ImageFilePicker.qml</file>
         <file>qml/forms/ConfigEditor.qml</file>
         <file>qml/components/HelpButton.qml</file>
-        <file>assets/baseline-help_outline-24px.svg</file>
-        <file>assets/baseline-delete_forever-24px.svg</file>
-        <file>qml/components/AboutPage.qml</file>
-        <file>assets/baseline-link-24px.svg</file>
-        <file>assets/AttributionsAndLicenses.txt</file>
-        <file>db/create_tables.sql</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>../assets/baseline-edit-24px.svg</file>
+        <file>../assets/baseline-folder_open-24px.svg</file>
+        <file>../assets/iconfinder_icon-33-clipboard-add_314289_black.svg</file>
+        <file>../assets/baseline-help_outline-24px.svg</file>
+        <file>../assets/baseline-delete_forever-24px.svg</file>
+        <file>../assets/baseline-link-24px.svg</file>
+        <file>../assets/AttributionsAndLicenses.txt</file>
     </qresource>
 </RCC>

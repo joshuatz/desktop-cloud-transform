@@ -1,6 +1,6 @@
 #include "database.h"
 #include "globalsettings.h"
-#include "lib/mousaviexecutesqlfile.h"
+#include "../lib/mousaviexecutesqlfile.h"
 #include "models/transformationlist.h"
 #include <QDebug>
 
