@@ -4,12 +4,16 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
 
+#include "database.h"
+
 using namespace testing;
 
-TEST(Database, InputOutput)
+TEST(InputOutput, DatabaseCanBuild)
 {
-    EXPECT_EQ(1, 1);
-    ASSERT_THAT(0, Eq(0));
+    // This should connect DB if exists, or create a new one if it doesn't
+    Database *testDb = Database::getInstance();
+    // Test that we can connect to db
+    ASSERT_THAT(testDb->connected,true);
 }
 
 #endif // TST_DATABASE_H

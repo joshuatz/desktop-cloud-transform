@@ -1,3 +1,6 @@
+include(qmake-vars.pri)
 TEMPLATE = subdirs
 SUBDIRS += \
-    app
+    app \
+    tests
+CONFIG += ordered

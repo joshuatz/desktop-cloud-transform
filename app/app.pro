@@ -1,7 +1,9 @@
+QT += core gui
 QT += qml
 QT += quick
 QT += quickcontrols2
 QT += sql
+QT += network
 CONFIG += c++11
 CONFIG += qtquickcompiler
 
@@ -12,6 +14,7 @@ CONFIG += qtquickcompiler
 DEFINES += QT_DEPRECATED_WARNINGS
 
 include("../config/extradefines.pro")
+include(../qmake-vars.pri)
 
 
 # You can also make your code fail to compile if it uses deprecated APIs.
@@ -20,17 +23,17 @@ include("../config/extradefines.pro")
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    helpers.cpp \
-    database.cpp \
-    globalsettings.cpp
+    $$PROJECTAPPDIR/main.cpp \
+    $$PROJECTAPPDIR/helpers.cpp \
+    $$PROJECTAPPDIR/database.cpp \
+    $$PROJECTAPPDIR/globalsettings.cpp
 
 HEADERS += \
-    appinfo.h \
-    helpers.h \
-    database.h \
-    globalsettings.h \
-    ../lib/mousaviexecutesqlfile.h
+    $$PROJECTAPPDIR/appinfo.h \
+    $$PROJECTAPPDIR/helpers.h \
+    $$PROJECTAPPDIR/database.h \
+    $$PROJECTAPPDIR/globalsettings.h \
+    $$PROJECTAPPDIR/../lib/mousaviexecutesqlfile.h
 
 RESOURCES += qml.qrc
 
