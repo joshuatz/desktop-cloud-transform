@@ -8,6 +8,7 @@ Item {
     anchors.fill: parent
     anchors.margins: 20
     property var cancelAction
+    property var settingsCopy: JSON.parse(JSON.stringify(GlobalSettings))
     Rectangle {
         anchors.fill: parent
         color: ThemeColors.darkAccent
@@ -100,7 +101,15 @@ Item {
                 CheckBox {
                     id: optedOutTrackingCheckbox
                     text: qsTr("Opt out of sharing of stats (note - this refers to DCT's stat sharing, not Cloudinary's)")
-                    checked: GlobalSettings.optedOutTracking
+                    checked: root.settingsCopy.optedOutTracking
+                }
+            }
+            Row {
+                width: parent.width
+                CheckBox {
+                    id: userDebugLogCheckbox
+                    text: qsTr("Turn on debug log")
+                    checked: root.settingsCopy.userDebugLogOn
                 }
             }
         }
@@ -140,12 +149,24 @@ Item {
     }
 
     property var submitForm: (function(){
-        var validated = GlobalSettings.updateInBulk(cloudinaryCloudNameInput.text,cloudinaryApiKeyInput.text,cloudinaryApiSecretInput.text,optedOutTrackingCheckbox.checked);
+        var validated = GlobalSettings.updateInBulk(cloudinaryCloudNameInput.text,cloudinaryApiKeyInput.text,cloudinaryApiSecretInput.text);
+        GlobalSettings.optedOutTracking = optedOutTrackingCheckbox.checked;
+        GlobalSettings.userDebugLogOn = userDebugLogCheckbox.checked;
+        GlobalSettings.emitSettingsChanged();
         if (validated){
+            GlobalSettings.saveToStorage();
             cancelAction();
         }
         else {
             formError.open();
         }
     })
+
+    property var resetForm: (function(){
+        // Necessary due to QML binding stuff
+        root.settingsCopy = JSON.parse(JSON.stringify(GlobalSettings));
+        cloudinaryCloudNameInput.text = GlobalSettings.getCloudinaryCloudName();
+        cloudinaryApiKeyInput.text = GlobalSettings.getCloudinaryApiKey();
+        cloudinaryApiSecretInput.text = GlobalSettings.getCloudinaryApiSecret();
+    });
 }

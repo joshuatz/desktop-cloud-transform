@@ -58,6 +58,7 @@ Item {
             anchors.topMargin: (parent.height - height) / 2
             Material.background: ThemeColors.darkAccent
             onClicked: {
+                settingsPopup.contentItem.resetForm();
                 settingsPopup.open();
             }
         }
