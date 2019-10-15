@@ -39,6 +39,9 @@ Macro | Incoming Transformation | Outgoing Transformation | What it does
 {timestamp} | Yes | Yes | Inserts the current time, as secs since epoch
 
 # Building
+First, note that this contains git *submodules*, so you either need to clone with `git clone --recursive`, or use `git submodule update --init` after cloning.
+
+Actual building:
  - So far I've only built for Windows, but there shouldn't be any Win specific dependencies in use. On my todo list is to build for Linux and OSX and see if there are any issues with the file read/writes
  - Compile tested with MSVC. Should work with MinGW too.
  - Steps should be as easy as:

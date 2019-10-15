@@ -43,7 +43,7 @@ include("lib/qt-google-analytics/qt-google-analytics.pri")
 #QML_IMPORT_PATH = C:\Qt\5.12.1\mingw73_64\qml
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
-QML_DESIGNER_IMPORT_PATH =
+#QML_DESIGNER_IMPORT_PATH =
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
