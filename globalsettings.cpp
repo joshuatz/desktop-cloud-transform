@@ -21,7 +21,7 @@ GlobalSettings *GlobalSettings::getInstance(){
 
 QString GlobalSettings::TABLE_NAME = "globalsettings";
 
-bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret,bool optedOutTracking){
+bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret){
     // @TODO refactor and call other validate function
     bool validated = true;
     QList<QString> emptyStringCheck = {cloudinaryCloudName,cloudinaryApiKey,cloudinaryApiSecret};
@@ -37,13 +37,10 @@ bool GlobalSettings::updateInBulk(QString cloudinaryCloudName, QString cloudinar
         m_cloudinaryCloudName = cloudinaryCloudName;
         m_cloudinaryApiKey = cloudinaryApiKey;
         m_cloudinaryApiSecret = cloudinaryApiSecret;
-        m_optedOutTracking = optedOutTracking;
-        this->saveToStorage();
     }
     else {
         m_cloudinaryProperlyConfigured = false;
     }
-    emit settingsChanged();
     return validated;
 }
 
@@ -52,8 +49,9 @@ void GlobalSettings::loadFromStorage(){
     m_cloudinaryApiKey = getSettingFromDb("cloudinaryApiKey").value.toString();
     m_cloudinaryApiSecret = getSettingFromDb("cloudinaryApiSecret").value.toString();
     m_optedOutTracking = getSettingFromDb("opted_out_tracking").value.toBool();
+    m_userDebugLogOn = getSettingFromDb("user_debuglog_on").value.toBool();
     m_cloudinaryProperlyConfigured = this->validateCloudinarySettings();
-    emit settingsChanged();
+    this->emitSettingsChanged();
 }
 
 void GlobalSettings::saveToStorage(){
@@ -61,6 +59,7 @@ void GlobalSettings::saveToStorage(){
     saveSettingToDb("cloudinaryApiKey",this->m_cloudinaryApiKey);
     saveSettingToDb("cloudinaryApiSecret",this->m_cloudinaryApiSecret);
     saveSettingToDb("opted_out_tracking",this->m_optedOutTracking);
+    saveSettingToDb("user_debuglog_on",this->m_userDebugLogOn);
 }
 
 settingDbResult GlobalSettings::getSettingFromDb(QString settingKey){

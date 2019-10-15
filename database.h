@@ -10,7 +10,7 @@ class Database
 {
 public:
     #ifdef QT_DEBUG
-    QString DB_PATH = "C:/Users/Joshua/Downloads/Temp/DCT/dct.db";
+    QString DB_PATH = "dct-debug.db";
     #else
     QString DB_PATH = "dct.db";
     #endif
