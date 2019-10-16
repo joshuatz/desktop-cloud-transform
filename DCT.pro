@@ -55,6 +55,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 # Icon
 RC_ICONS = transform_352180.ico
 
+# Open SSL
+# See https://doc.qt.io/qt-5/ssl.html#enabling-and-disabling-ssl-support
+# This needs major cleanup if I want to start building for other targets...
+OPENSSL_LIB_DIR = C:\Program Files\OpenSSL-Win64\lib
+!exists($$OPENSSL_LIB_DIR): error("cant find openssl")
+# OPENSSL_LIBS='-L$$OPENSSL_LIB_DIR -lssl -lcrypto' ./configure -openssl-linked
+LIBS += -L"$$OPENSSL_LIB_DIR" -llibssl -llibcrypto
 # Debug vs release stuff
 CONFIG (debug, debug|release) {
     CONFIG += qml_debug
