@@ -29,7 +29,8 @@ Macros are case-insensitive; I'm using camelcase below just to make it easier to
 
 Macro | Incoming Transformation | Outgoing Transformation | What it does
 --- | --- | --- | ---
-{uploaded} | No | Yes | Inserts public ID as overlay - "l_PUBLICID"
+{uploaded} | No | Yes | Inserts public ID as overlay into chain - "l_PUBLICID"
+{uploadedId} | No | Yes | Inserts public ID, *as-is*
 {width} | Yes | Yes | Inserts width in pixels of local file being uploaded
 {height} | Yes | Yes | Inserts height in pixels of local file being uploaded
 {filename} | Yes | Yes | Inserts the filename *including* the extension

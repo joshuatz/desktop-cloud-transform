@@ -211,7 +211,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
 
             if (config.usesOutgoingTransformationRawString){
                 // Currently, it only makes sense to use this if the outgoing transformation string references the uploaded image.
-                if (config.outoingTransformationRawString.contains("{uploaded}",Qt::CaseInsensitive)){
+                if (config.outoingTransformationRawString.contains("{uploaded}",Qt::CaseInsensitive) || config.outoingTransformationRawString.contains("{uploadedId}",Qt::CaseInsensitive)) {
                     QString uploadImageMacroVal = "";
                     // We need to construct a NEW final image url
                     // Basically need to compute string to represent the BASE (original raw image) + any incoming trans (raw trans string, named preset, etc)
@@ -227,6 +227,7 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                         uploadImageMacroVal = "l_" + result.id;
                     }
                     QString finalOutgoingTransString = config.outoingTransformationRawString.replace("{uploaded}",uploadImageMacroVal,Qt::CaseSensitivity::CaseInsensitive);
+                    finalOutgoingTransString = finalOutgoingTransString.replace("{uploadedId}",result.id,Qt::CaseSensitivity::CaseInsensitive);
                     // Final macro replacements
                     finalOutgoingTransString = Uploader::macroReplacer(finalOutgoingTransString,this->m_localFilePath,QMap<QString,QString>());
                     finalOutgoingTransString = Cloudinary::autoEscapeTransString(finalOutgoingTransString);
