@@ -4,6 +4,7 @@
 #include <QSqlRecord>
 #include <QSqlQueryModel>
 #include <QDebug>
+#include <logger.h>
 
 GlobalSettings::GlobalSettings(QObject *parent) : QObject(parent)
 {
@@ -60,6 +61,8 @@ void GlobalSettings::saveToStorage(){
     saveSettingToDb("cloudinaryApiSecret",this->m_cloudinaryApiSecret);
     saveSettingToDb("opted_out_tracking",this->m_optedOutTracking);
     saveSettingToDb("user_debuglog_on",this->m_userDebugLogOn);
+    Logger().refreshLogPrefs();
+    Logger().logStr("db updated");
 }
 
 settingDbResult GlobalSettings::getSettingFromDb(QString settingKey){

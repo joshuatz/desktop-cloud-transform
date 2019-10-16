@@ -20,6 +20,7 @@ include("config/extradefines.pro")
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    logger.cpp \
     main.cpp \
     helpers.cpp \
     database.cpp \
@@ -30,7 +31,8 @@ HEADERS += \
     helpers.h \
     database.h \
     globalsettings.h \
-    lib/mousaviexecutesqlfile.h
+    lib/mousaviexecutesqlfile.h \
+    logger.h
 
 RESOURCES += qml.qrc
 

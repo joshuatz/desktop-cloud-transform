@@ -15,6 +15,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QQmlContext>
+#include "logger.h"
 
 int main(int argc, char *argv[])
 {
@@ -62,6 +63,9 @@ int main(int argc, char *argv[])
     // Log startup :)
     Stats::getInstance()->logStat("application","startup",false);
     Stats::getInstance()->fireGaEvent("application","startup","",NULL);
+    Logger *logger = Logger().getInstance();
+    logger->logStr("Program startup!");
+
 
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
     if (engine.rootObjects().isEmpty())

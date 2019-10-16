@@ -41,6 +41,9 @@ public slots:
     QString getCloudinaryApiSecret(){
         return m_cloudinaryApiSecret;
     }
+    bool getUserDebugLogOn() {
+        return m_userDebugLogOn;
+    }
     void emitSettingsChanged(){
         emit settingsChanged();
     }
