@@ -1,9 +1,9 @@
-#include "logger.h"
 #include "globalsettings.h"
+#include "helpers.h"
+#include "logger.h"
+#include <QDebug>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDebug>
-#include "helpers.h"
 
 Logger *Logger::m_instance = nullptr;
 
@@ -37,79 +37,30 @@ void Logger::refreshLogPrefs() {
     this->_logToFile = this->_userWantsLogging;
 }
 
-bool Logger::_openLogFile(QFile *filePtr) {
-    try {
-        filePtr = new QFile(_logFileDest);
-        //QFile file(_logFileDest);
-        //filePtr = &file;
-        filePtr->open(QIODevice::Append | QIODevice::Text);
-        QTextStream out(filePtr);
-        out << "\n\nOPENED!";
-        return true;
-    } catch (...) {
-        filePtr = nullptr;
-        return false;
-    }
-}
-
 QFile *Logger::_openLogFile() {
     QFile *filePtr = nullptr;
     try {
         filePtr = new QFile(_logFileDest);
         filePtr->open(QIODevice::Append | QIODevice::Text);
-        return filePtr;
     } catch (...) {
-        return filePtr;
+        qDebug() << "Could not open debug-log file";
     }
-}
-
-FILE *Logger::_openLogFileOs() {
-    FILE* filePtr = nullptr;
-    try {
-        QFile qfileObj(_logFileDest);
-        qfileObj.open(QIODevice::Append | QIODevice::Text);
-        int fileHndl = qfileObj.handle();
-        filePtr = _fdopen(fileHndl, "ab");
-        return filePtr;
-    } catch (...) {
-        return filePtr;
-    }
+    return filePtr;
 }
 
 void Logger::clear() {
     if (_logToFile) {
-        QFile *file = nullptr;
-        if(this->_openLogFile(file)) {
-            file->resize(0);
-            file->close();
-        }
+        QFile *file = this->_openLogFile();
+        file->resize(0);
+        file->close();
     }
 }
 
 void Logger::logStr(QString msg) {
     if (_logToFile) {
-
-        QFile* file;
-        /*
-        if(this->_openLogFile(&file)) {
-            //file.open(QIODevice::Append | QIODevice::Text);
-            QTextStream out(&file);
-            //file.write("FOOBAR");
-            out << msg;
-            file.close();
-        }
-        */
-
-        /*
-        FILE *file = this->_openLogFileOs();
+        QFile *file = this->_openLogFile();
         QTextStream out(file);
-        out << msg;
-        fclose(file);
-        */
-
-        file = this->_openLogFile();
-        QTextStream out(file);
-        out << msg;
+        out << "\n" << msg;
         file->close();
     }
     if (Helpers::getIsDebug()) {

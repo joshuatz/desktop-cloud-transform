@@ -7,6 +7,7 @@
 #include "database.h"
 #include "globalsettings.h"
 #include "helpers.h"
+#include "logger.h"
 #include "models/stats.h"
 #include "models/transformationlist.h"
 #include "models/transformationconfig.h"
@@ -15,7 +16,6 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QQmlContext>
-#include "logger.h"
 
 int main(int argc, char *argv[])
 {

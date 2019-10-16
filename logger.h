@@ -1,8 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <QString>
 #include <QFile>
+#include <QString>
 
 class Logger
 {
@@ -20,9 +20,7 @@ private:
     bool _logToFile = true;
     QString _logFileDest = "./debug-log.txt";
     bool _userWantsLogging = false;
-    bool _openLogFile(QFile *filePtr);
     QFile* _openLogFile();
-    FILE* _openLogFileOs();
 
 };
 

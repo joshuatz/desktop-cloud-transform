@@ -1,4 +1,5 @@
 #include "downloader.h"
+#include "logger.h"
 
 Downloader *Downloader::m_instance = nullptr;
 
@@ -36,7 +37,9 @@ void Downloader::downloadImageFileToPathWithSlotString(QString remotePath, QStri
             }
             else {
                 // Uh-Oh!
-                qDebug() << "Download success, but IO error writing to disc at path : " << localPath;
+                QString errMsg = "Download success, but IO error writing to disc at path : " + localPath;
+                qDebug() << errMsg;
+                Logger().getInstance()->logStr(errMsg);
                 downloadWorked = false;
             }
             delete file;

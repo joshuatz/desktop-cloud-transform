@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QtNetwork>
 #include "transformationconfig.h"
+#include "logger.h"
 
 struct UploadActionResult {
     bool success;
@@ -82,6 +83,7 @@ private:
     bool m_hasAttachedConfig = false;
     TransformationConfig m_attachedConfig;
     QString m_localFilePath;
+    Logger *loggerInstance;
 };
 
 Q_DECLARE_METATYPE(UploadActionResult);
