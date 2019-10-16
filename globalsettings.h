@@ -19,6 +19,7 @@ class GlobalSettings : public QObject
     Q_PROPERTY(bool cloudinaryConfigured MEMBER m_cloudinaryProperlyConfigured NOTIFY settingsChanged)
     Q_PROPERTY(QString cloudinaryCloudName MEMBER m_cloudinaryCloudName NOTIFY settingsChanged)
     Q_PROPERTY(bool optedOutTracking MEMBER m_optedOutTracking NOTIFY settingsChanged)
+    Q_PROPERTY(bool userDebugLogOn MEMBER m_userDebugLogOn NOTIFY settingsChanged)
 public:
     explicit GlobalSettings(QObject *parent = nullptr);
     static GlobalSettings *getInstance();
@@ -28,7 +29,7 @@ signals:
     void settingsChanged();
     void internetConnectionChanged();
 public slots:
-    bool updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret, bool optedOutTracking);
+    bool updateInBulk(QString cloudinaryCloudName, QString cloudinaryApiKey, QString cloudinaryApiSecret);
     void loadFromStorage();
     void saveToStorage();
     QString getCloudinaryCloudName(){
@@ -40,8 +41,11 @@ public slots:
     QString getCloudinaryApiSecret(){
         return m_cloudinaryApiSecret;
     }
-    bool getIsOptedOutTracking(){
-        return m_optedOutTracking;
+    bool getUserDebugLogOn() {
+        return m_userDebugLogOn;
+    }
+    void emitSettingsChanged(){
+        emit settingsChanged();
     }
 private:
     static GlobalSettings *m_instance;
@@ -52,6 +56,7 @@ private:
     bool m_hasInternet = false;
     settingDbResult getSettingFromDb(QString settingKey);
     bool saveSettingToDb(QString settingKey, QVariant settingVal);
+    bool m_userDebugLogOn = false;
     bool m_optedOutTracking = false;
 };
 

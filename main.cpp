@@ -7,6 +7,7 @@
 #include "database.h"
 #include "globalsettings.h"
 #include "helpers.h"
+#include "logger.h"
 #include "models/stats.h"
 #include "models/transformationlist.h"
 #include "models/transformationconfig.h"
@@ -62,6 +63,9 @@ int main(int argc, char *argv[])
     // Log startup :)
     Stats::getInstance()->logStat("application","startup",false);
     Stats::getInstance()->fireGaEvent("application","startup","",NULL);
+    Logger *logger = Logger().getInstance();
+    logger->logStr("Program startup!");
+
 
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
     if (engine.rootObjects().isEmpty())

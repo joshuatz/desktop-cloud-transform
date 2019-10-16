@@ -14,6 +14,7 @@
 
 Uploader::Uploader(QObject *parent) : QObject(parent)
 {
+    this->loggerInstance = Logger().getInstance();
 }
 
 Uploader *Uploader::m_instance = nullptr;
@@ -163,12 +164,16 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
     }
 
     if (reply->error()){
+        QString errorMsg = reply->errorString();
         result.success = false;
         result.messageString = "Error in response from Cloudinary";
         qDebug() << "network reply error!";
-        qDebug() << reply->errorString();
+        qDebug() << errorMsg;
+        this->loggerInstance->logStr(errorMsg);
         if (reply->errorString().contains("TLS ",Qt::CaseInsensitive)){
-            qDebug() << "SSL build version = " << QSslSocket::sslLibraryVersionString() << " || SSL lib version = " << QSslSocket::sslLibraryVersionString();
+            QString sslErrMsg = "SSL build version = " + QSslSocket::sslLibraryVersionString() + " || SSL lib version = " + QSslSocket::sslLibraryVersionString();
+            qDebug() << sslErrMsg;
+            this->loggerInstance->logStr(sslErrMsg);
         }
     }
     else {
