@@ -167,9 +167,9 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
         QString errorMsg = reply->errorString();
         result.success = false;
         result.messageString = "Error in response from Cloudinary";
-        qDebug() << "network reply error!";
-        qDebug() << errorMsg;
-        this->loggerInstance->logStr(errorMsg);
+        QString debugMsg = "network reply error!" + errorMsg;
+        qDebug() << debugMsg;
+        this->loggerInstance->logStr(debugMsg);
         if (reply->errorString().contains("TLS ",Qt::CaseInsensitive)){
             QString sslErrMsg = "SSL build version = " + QSslSocket::sslLibraryVersionString() + " || SSL lib version = " + QSslSocket::sslLibraryVersionString();
             qDebug() << sslErrMsg;
@@ -287,7 +287,9 @@ void Uploader::receiveNetworkReply(QNetworkReply *reply){
                 }
 
                 // Actually download the file to disk
-                qDebug () << "Saving " << finalImageUrlToDownload << "  to  " << pathToSaveFileTo;
+                QString debugMsg = "Saving " + finalImageUrlToDownload + "  to  " + pathToSaveFileTo;
+                qDebug () << debugMsg;
+                this->loggerInstance->logStr(debugMsg);
                 Downloader::downloadImageFileToPathWithSlotString(finalImageUrlToDownload,pathToSaveFileTo,result.id,this,"receiveDownloadResultSlot");
 
                 Stats::getInstance()->logStat("application","download",false);
