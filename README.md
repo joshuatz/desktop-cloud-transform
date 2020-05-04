@@ -91,10 +91,13 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Incoming transformations on upload - https://cloudinary.com/documentation/upload_images#incoming_transformations
 # TODOS
 ## !! - High priority - !!
+ - Add support for [*signed URLs*](https://cloudinary.com/documentation/control_access_to_media#signed_delivery_urls) (necessary for downloading via transformation URL, if user has enabled ["strict transformations"](https://cloudinary.com/documentation/control_access_to_media#strict_transformations))
+ - Fix help tooltip overflow
  - Work on build script for creating deployment releases, and try to reduce output size
  - ~~Timeout for auto-close of success modal needs to be auto-cancelled if clicked on~~
      - For right now, just removed auto-close entirely
 ## Backlog / Should implement
+ - Highlight transformation string on click for easy copy and paste
  - DB migrations for upgrades to app
  - Refactor naming of classes, objects, methods - distinction between transformations and configs
  - Tag items uploaded through this tool to make easier to find online
