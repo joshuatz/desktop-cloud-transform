@@ -93,6 +93,8 @@ Row | Category | Action | Uses Cloudinary (credits)
 ## !! - High priority - !!
  - Add support for [*signed URLs*](https://cloudinary.com/documentation/control_access_to_media#signed_delivery_urls) (necessary for downloading via transformation URL, if user has enabled ["strict transformations"](https://cloudinary.com/documentation/control_access_to_media#strict_transformations))
  - Fix help tooltip overflow
+ - Preserve filename on regular uploads (right now, it is generating a new unique ID, regardless of filename)
+ - Add "duplicate" button, to clone existing configs and modify
  - Work on build script for creating deployment releases, and try to reduce output size
  - ~~Timeout for auto-close of success modal needs to be auto-cancelled if clicked on~~
      - For right now, just removed auto-close entirely
