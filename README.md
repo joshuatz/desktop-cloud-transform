@@ -109,6 +109,7 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Unit tests
  - Cmd line support
  - Use richtext in textarea for link - https://doc.qt.io/qt-5/richtext-html-subset.html
+ - Add support for more hosts (Imgur anonymous upload as top priority)
 ## Icebox / optional:
  - When uploading images, use filename to check if already uploaded, and if so, offer option to "rename" version on cloudinary sever
      - Use https://cloudinary.com/documentation/image_upload_api_reference#rename_method
