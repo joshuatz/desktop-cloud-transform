@@ -91,6 +91,7 @@ Row | Category | Action | Uses Cloudinary (credits)
  - Incoming transformations on upload - https://cloudinary.com/documentation/upload_images#incoming_transformations
 # TODOS
 ## !! - High priority - !!
+ - Add white borders inside icon so it shows up better on dark backgrounds (see [taskbar screenshot](https://user-images.githubusercontent.com/17817563/90127379-f0143b00-dd19-11ea-88bb-f3c2e16b6575.png))
  - Add support for [*signed URLs*](https://cloudinary.com/documentation/control_access_to_media#signed_delivery_urls) (necessary for downloading via transformation URL, if user has enabled ["strict transformations"](https://cloudinary.com/documentation/control_access_to_media#strict_transformations))
  - Fix help tooltip overflow
  - Preserve filename on regular uploads (right now, it is generating a new unique ID, regardless of filename)
